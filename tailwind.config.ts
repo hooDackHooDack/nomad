@@ -7,6 +7,11 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    screens: {
+      sm: { min: '375px', max: '743px' },
+      md: { min: '744px', max: '1919px' },
+      lg: { min: '1920px' },
+    },
     colors: {
       black: {
         DEFAULT: '#1B1B1B',
