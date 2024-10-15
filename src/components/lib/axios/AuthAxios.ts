@@ -29,7 +29,7 @@ authApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (
-      error.response?.data?.message === 'jwt expired' &&
+      error.response?.data?.message === 'Unauthorized' &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
