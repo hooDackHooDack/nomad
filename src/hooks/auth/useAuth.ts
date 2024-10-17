@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserInfo } from '@/types/user/User';
-import basicApi from '@/components/lib/axios/baiscAxios';
+import { UserInfo } from '@/types/user/userInfo';
+import basicApi from '@/components/lib/axios/basic';
 import Cookies from 'js-cookie';
-import authApi from '@/components/lib/axios/AuthAxios';
+import authApi from '@/components/lib/axios/auth';
 
 interface LoginResponse {
   user: UserInfo;
