@@ -33,6 +33,7 @@ export function useAuth() {
     queryKey: ['user'],
     queryFn: fetchUserInfo,
     retry: false,
+    staleTime: Infinity, // 항상 fresh / userUpdate에만 직접 변경
   });
 
   const loginMutation = useMutation({
@@ -61,6 +62,38 @@ export function useAuth() {
     queryClient.setQueryData(['user'], null);
   };
 
+  /**
+   * 
+   * 1. Mutaiton함수 하나로 전부 다루기
+    호출하면 ->  닉네임 중복확인도하고 / 비밀번호 확인도하고 / 그다음 응답값(업데이트된 UserInfo)으로 쿼리변경
+   * 2.모든과정이 통과되고 그다음 mutation으로  기존 쿼리만 변경하기
+    위의 과정 중 Api관련된 로직 분리하고, 응답값을 받았을 때 그때서야 Mutation돌리기
+   */
+
+  // const updateProfileMutation = useMutation({
+  //   mutationFn: async (updateData: {
+  //     nickname: string;
+  //     profileImageUrl: string;
+  //   }) => {
+  //     const { data } = await authApi.patch<UserInfo>(
+  //       '/users/profile',
+  //       updateData,
+  //     );
+  //     return data;
+  //   },
+  //   onSuccess: (updatedUser) => {
+  //     // 변경된 필드만 업데이트
+  //     queryClient.setQueryData(['user'], (oldData: UserInfo | undefined) => {
+  //       if (!oldData) return updatedUser;
+  //       return {
+  //         ...oldData,
+  //         nickname: updatedUser.nickname,
+  //         profileImageUrl: updatedUser.profileImageUrl,
+  //       };
+  //     });
+  //   },
+  // });
+
   return {
     user,
     isLoading,
@@ -69,5 +102,8 @@ export function useAuth() {
     logout,
     isLoginLoading: loginMutation.isPending,
     loginError: loginMutation.error,
+    // updateProfile: updateProfileMutation.mutate,
+    // isProfileUpdating: updateProfileMutation.isPending,
+    // profileUpdateError: updateProfileMutation.error,
   };
 }
