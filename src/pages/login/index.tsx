@@ -1,5 +1,4 @@
 import { useAuth } from '@/hooks/auth/useAuth';
-import Header from '@/components/header/Header';
 
 export default function Login() {
   const { login, user, logout, isLoading } = useAuth();
@@ -28,7 +27,6 @@ export default function Login() {
 
   return (
     <div>
-      <Header />
       {user ? (
         <p>{`${user.nickname}님 안녕하세요!`}</p>
       ) : (
