@@ -1,5 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 const Header = () => {
   /**
@@ -8,13 +8,14 @@ const Header = () => {
    * 2. 헤더 네비게이션 고민
    * 3. 로고 고민
    */
+  const { user } = useAuth();
 
   return (
     <div className="w-full mx-auto border-b-[1px] border-gray-200">
       <div className="max-w-[1200px] flex justify-between p-5 mx-auto">
         <Link href="/">똘망똘망</Link>
         <div className="flex gap">
-          <Link href="#">로그인</Link>
+          {user ? <p>{user.nickname}</p> : <Link href="/login">로그인</Link>}
         </div>
       </div>
     </div>
