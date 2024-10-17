@@ -6,3 +6,13 @@ body {
   max-width: 1920px;
   margin: 0 auto;
 }
+
+input {
+  border-radius: 6px;
+  border: 1px solid;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid;
+}
