@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuth, logout } from '@/hooks/auth/useAuth';
 
 const Header = () => {
   /**
@@ -8,7 +8,7 @@ const Header = () => {
    * 2. 헤더 네비게이션 고민
    * 3. 로고 고민
    */
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) return null;
   return (
