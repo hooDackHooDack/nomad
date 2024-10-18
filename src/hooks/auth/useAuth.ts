@@ -64,9 +64,6 @@ export function useAuth() {
   };
 }
 export function logout() {
-  console.log('click');
   Cookies.remove('accessToken');
-  localStorage.removeItem('loginTime');
-  localStorage.removeItem('lastAuthApiCall');
   window.location.reload();
 }
