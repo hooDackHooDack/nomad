@@ -49,9 +49,7 @@ export function useAuth() {
       localStorage.setItem('lastAuthApiCall', now.toString());
       queryClient.setQueryData(['user'], user);
     },
-    onError: (error) => {
-      console.error('로그인실패:', error);
-    },
+    onError: () => console.log('로그인실패'),
   });
 
   return {
