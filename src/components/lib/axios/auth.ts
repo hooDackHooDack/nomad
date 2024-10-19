@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
 import { logout } from '@/hooks/auth/useAuth';
 import { jwtDecode } from 'jwt-decode';
+import basicApi from './basic';
 
 interface JWTPayload {
   exp: number;
@@ -11,16 +12,17 @@ interface JWTPayload {
   iss: string;
 }
 
-const REFRESH_THRESHOLD = 29 * 60; // 29분
+const REFRESH_THRESHOLD = 5 * 60; // 5분
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 // 토큰 갱신 중복 방지를 위한 플래그
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-// 토큰 갱신 대기 중인 요청들을 처리하는 함수
+// 토큰 갱신 대기 중인 요청들을 처리하는 함수, 새로운 토큰이 발급되면 대기 중이던 모든 요청들에게 새 토큰을 전달
 const onRefreshed = (token: string) => {
   refreshSubscribers.forEach((callback) => callback(token));
+  // 대기열 초기화
   refreshSubscribers = [];
 };
 
@@ -28,22 +30,6 @@ const onRefreshed = (token: string) => {
 const addRefreshSubscriber = (callback: (token: string) => void) => {
   refreshSubscribers.push(callback);
 };
-
-const basicApi = axios.create({
-  baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
-
-const authApi: AxiosInstance = axios.create({
-  baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
 
 // JWT 토큰 검증 및 남은 시간 계산
 const validateToken = (
@@ -69,7 +55,7 @@ const refreshAccessToken = async (
   currentToken: string,
 ): Promise<string | null> => {
   try {
-    // 재귀 방지를 위한 basicApi 사용
+    // 인터셉터 재귀호출 방지를 위한 basicApi 사용
     const { data } = await basicApi.post<{ accessToken: string }>(
       '/auth/tokens',
       {},
@@ -86,6 +72,13 @@ const refreshAccessToken = async (
   }
 };
 
+const authApi: AxiosInstance = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
 authApi.interceptors.request.use(
   async (config) => {
     const accessToken = Cookies.get('accessToken');
