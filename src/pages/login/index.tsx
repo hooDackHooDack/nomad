@@ -1,8 +1,14 @@
-import { useAuth, logout } from '@/hooks/auth/useAuth';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from '/public/logo/logo_col.svg';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ErrorResponse } from '@/types/form/error/error';
 import { LoginFormData } from '@/types/form/login/loginForm';
+import Link from 'next/link';
+import GoogleLogo from '/public/icons/social/google.svg';
+import KakaoLogo from '/public/icons/social/kakao.svg';
+import { useState } from 'react';
+import OpenEye from '/public/icons/input/visibility_on.svg';
+import CloseEye from '/public/icons/input/visibility_off.svg';
 
 // 유효성 검사 규칙
 const validationRules = {
@@ -24,7 +30,7 @@ const validationRules = {
 };
 
 export default function Login() {
-  const { login, user, isLoading } = useAuth();
+  const { login, user, isLoading, isLoginLoading } = useAuth();
   const {
     register,
     handleSubmit,
@@ -32,6 +38,7 @@ export default function Login() {
   } = useForm<LoginFormData>({
     mode: 'onSubmit',
   });
+  const isButtonDisabled = isSubmitting || isLoginLoading;
 
   const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
     login(
@@ -74,30 +81,37 @@ export default function Login() {
     aaa();
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   if (isLoading) return null;
 
   return (
     <div>
-      {user ? (
-        <p>{`${user.nickname}님 안녕하세요!`}</p>
-      ) : (
-        <div>
-          <button onClick={testButton}>윤재 로그인</button>
-          <button onClick={testButton2}>예원 로그인</button>
+      {user ? null : (
+        <div className="flex justify-around mt-2">
+          <button onClick={testButton} className="rounded-full w-16 h-16 p-2">
+            윤재
+          </button>
+          <button onClick={testButton2} className="rounded-full w-16 h-16 p-2">
+            예원
+          </button>
         </div>
       )}
-      <button onClick={logout}>로그아웃</button>
-      <div>
-        <Logo />
-      </div>
-      <div>
+
+      <div className="flex flex-col max-w-[600px] mx-auto mt-12">
+        <Logo className="self-center" />
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-5 max-w-[800px] mx-auto">
+          <div className="flex flex-col gap-7 mt-14">
             <div className="flex-col">
-              <div>
-                <label htmlFor="email">이메일</label>
-              </div>
-              <div>
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="email"
+                  className="text-lg font-regular text-black"
+                >
+                  이메일
+                </label>
                 <input
                   className={`border w-full h-14 px-4 ${
                     errors.email
@@ -117,10 +131,13 @@ export default function Login() {
               )}
             </div>
             <div className="flex-col">
-              <div>
-                <label htmlFor="password">비밀번호</label>
-              </div>
-              <div>
+              <div className="flex flex-col gap-2 relative">
+                <label
+                  htmlFor="password"
+                  className="text-lg font-regular text-black"
+                >
+                  비밀번호
+                </label>
                 <input
                   className={`border w-full h-14 px-4 ${
                     errors.password
@@ -128,10 +145,17 @@ export default function Login() {
                       : 'border-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
                   }`}
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="비밀번호를 입력해주세요"
                   {...register('password', validationRules.password)}
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-4 top-[60px] transform -translate-y-1/2 cursor-pointer border-none"
+                >
+                  {showPassword ? <OpenEye /> : <CloseEye />}
+                </button>
               </div>
               {errors.password && (
                 <p className="mt-1 text-red text-sm">
@@ -141,13 +165,33 @@ export default function Login() {
             </div>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300"
+              disabled={isButtonDisabled}
+              className="bg-green-dark text-gray-50 text-lg font-bold py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
             >
               로그인 하기
             </button>
           </div>
         </form>
+        <div className="flex justify-center gap-2 mt-8">
+          <p>회원이 아니신가요?</p>
+          <Link href={'#'} className="underline text-green-dark">
+            회원가입하기
+          </Link>
+        </div>
+
+        <div className="flex flex-col gap-10 mt-10">
+          <div className="relative flex items-center justify-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-xl font-regular text-gray-700">
+              SNS 계정으로 로그인하기
+            </span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+          <div className="flex gap-4 justify-center">
+            <GoogleLogo />
+            <KakaoLogo />
+          </div>
+        </div>
       </div>
     </div>
   );
