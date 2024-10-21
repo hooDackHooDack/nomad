@@ -116,7 +116,7 @@ export default function Login() {
                   className={`border w-full h-14 px-4 ${
                     errors.email
                       ? 'border-red focus:border-red focus:outline-none focus:ring-1 focus:ring-red'
-                      : 'border-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
+                      : 'border-gray-500 focus:border-green-dark focus:outline-none focus:ring-1 focus:ring-green-dark'
                   }`}
                   id="email"
                   type="email"
@@ -142,7 +142,7 @@ export default function Login() {
                   className={`border w-full h-14 px-4 ${
                     errors.password
                       ? 'border-red focus:border-red focus:outline-none focus:ring-1 focus:ring-red'
-                      : 'border-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
+                      : 'border-gray-500 focus:border-green-dark focus:outline-none focus:ring-1 focus:ring-green-dark'
                   }`}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
