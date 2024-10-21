@@ -26,18 +26,38 @@ interface ActivitiesResponse {
 const fetchActivities = async (
   page: number = 1,
   size: number = 6,
+  category?: string,
+  sort?: string,
 ) => {
+  // 기본 params 타입 정의
+  const params: {
+    method: string;
+    page: number;
+    size: number;
+    category?: string;
+    sort?: string;
+  } = {
+    method: 'offset',
+    page,
+    size,
+  };
+
+  // category가 있을 때만 params에 추가
+  if (category) {
+    params.category = category;
+  }
+
+  if (sort) {
+    params.sort = sort;
+  }
+
   const { data } = await basicApi.get<ActivitiesResponse>('activities', {
-    params: {
-      method: 'offset',
-      page,
-      size,
-    },
+    params,
   });
   return data;
 };
 
-const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => (
+const ActivityCard = ({ activity }: { activity: Activity }) => (
   <div className="bg-white rounded-lg shadow-md overflow-hidden">
     <img
       src={activity.bannerImageUrl}
@@ -60,20 +80,45 @@ const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => (
 
 const Main = () => {
   const [page, setPage] = useState(1);
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('');
   const pageSize = 6;
 
   const { data, isPending, isError, error, isFetching } = useQuery<
     ActivitiesResponse,
     Error
   >({
-    queryKey: ['activities', page],
-    queryFn: () => fetchActivities(page, pageSize),
+    queryKey: ['activities', page, category, sort],
+    queryFn: () => fetchActivities(page, pageSize, category, sort),
     placeholderData: keepPreviousData,
   });
 
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
   };
+
+  const handleSortChange = (selectedSort: string) => {
+    setSort(selectedSort);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (selectedCategory: string) => {
+    if (category === selectedCategory) {
+      setCategory(''); // 동일한 카테고리를 누르면 선택 취소
+    } else {
+      setCategory(selectedCategory); // 새로운 카테고리 선택
+    }
+    setPage(1); // 페이지를 1로 초기화
+  };
+
+  const categories = [
+    '문화 · 예술',
+    '식음료',
+    '스포츠',
+    '투어',
+    '관광',
+    '웰빙',
+  ];
 
   if (isPending) return <div className="text-center py-10">Loading...</div>;
   if (isError)
@@ -86,6 +131,32 @@ const Main = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Activities</h1>
+
+      <div className="mb-6">
+        <div className="mb-2">Category</div>
+        <div className="flex gap-2">
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => handleCategoryChange(c)}
+              className={`px-3 py-1 rounded-md ${category === c ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <select
+          value={sort}
+          onChange={(e) => handleSortChange(e.target.value)}
+          className="px-3 py-1 rounded-md mb-2"
+        >
+          <option value="">가격</option>
+          <option value="price_asc">가격 낮은 순</option>
+          <option value="price_desc">가격 높은 순</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {data?.activities.map((activity) => (
