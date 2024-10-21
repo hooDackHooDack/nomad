@@ -2,11 +2,11 @@
 import { Activity } from '@/types/activity/activity';
 
 const ActivityCard = ({ activity }: { activity: Activity }) => (
-  <div className="w-72">
+  <div className="w-full">
     <img
       src={activity.bannerImageUrl}
       alt={activity.title}
-      className="size-72 object-cover rounded-xl mb-4"
+      className="w-full h-48 object-cover rounded-xl mb-4"
     />
     <p className="text-lg mb-3">
       ⭐ {activity.rating}
