@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   UseFormRegister,
   FieldError,
@@ -18,8 +18,6 @@ type InputProps<TFormValues extends FieldValues> = {
   error?: FieldError;
   type: InputType;
   placeholder?: string;
-  showPassword?: boolean;
-  togglePasswordVisibility?: () => void;
   validationRule?: RegisterOptions<TFormValues, Path<TFormValues>>;
 };
 
@@ -30,10 +28,10 @@ function FormInput<TFormValues extends FieldValues>({
   type,
   error,
   placeholder,
-  showPassword,
-  togglePasswordVisibility,
   validationRule,
 }: InputProps<TFormValues>) {
+  const [showPassword, setShowPassword] = useState(false);
+
   const inputClassName = `border w-full px-4 ${
     error
       ? 'border-red focus:border-red focus:outline-none focus:ring-1 focus:ring-red'
@@ -60,6 +58,10 @@ function FormInput<TFormValues extends FieldValues>({
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="flex-col">
       <div className="flex flex-col gap-2 relative">
@@ -67,7 +69,7 @@ function FormInput<TFormValues extends FieldValues>({
           {label}
         </label>
         {renderInput()}
-        {type === 'password' && togglePasswordVisibility && (
+        {type === 'password' && (
           <button
             type="button"
             onClick={togglePasswordVisibility}

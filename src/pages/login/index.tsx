@@ -3,14 +3,15 @@ import Logo from '/public/logo/logo_col.svg';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ErrorResponse } from '@/types/form/error/error';
 import { LoginFormData } from '@/types/form/login/loginForm';
-import { useState } from 'react';
 import { validationRules } from '@/utils/form/validationRules';
 import SocialBox from '@/components/form/socialBox/SocialBox';
 import AuthSwitcher from '@/components/form/authSwitcher/AuthSwitcher';
 import FormInput from '@/components/form/input/FormInput';
+import { useRouter } from 'next/router';
 
 export default function Login() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -18,6 +19,7 @@ export default function Login() {
   } = useForm<LoginFormData>({
     mode: 'onSubmit',
   });
+
   const isButtonDisabled = isSubmitting || isLoginLoading;
 
   const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
@@ -61,11 +63,8 @@ export default function Login() {
     aaa();
   };
 
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
   if (isLoading) return null;
+  if (user) router.push('/');
 
   return (
     <div>
@@ -100,8 +99,6 @@ export default function Login() {
               register={register}
               error={errors.password}
               placeholder="비밀번호를 입력해주세요"
-              showPassword={showPassword}
-              togglePasswordVisibility={togglePasswordVisibility}
               validationRule={validationRules.password}
             />
             <button
@@ -115,7 +112,7 @@ export default function Login() {
         </form>
         <AuthSwitcher
           text="회원이 아니신가요?"
-          link="/#"
+          link="/sign-up"
           linkText="회원가입하기"
         />
         <SocialBox
