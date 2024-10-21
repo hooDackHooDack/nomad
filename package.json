@@ -20,7 +20,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-js-pagination": "^3.0.3",
-    "react-hook-form": "^7.53.0",
+    "react-hook-form": "^7.53.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
