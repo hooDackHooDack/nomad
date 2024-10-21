@@ -28,27 +28,31 @@ const fetchActivities = async (
   size: number = 6,
   category?: string,
   sort?: string,
+  keyword?: string,
 ) => {
-  // 기본 params 타입 정의
   const params: {
     method: string;
     page: number;
     size: number;
     category?: string;
     sort?: string;
+    keyword?: string;
   } = {
     method: 'offset',
     page,
     size,
   };
 
-  // category가 있을 때만 params에 추가
   if (category) {
     params.category = category;
   }
 
   if (sort) {
     params.sort = sort;
+  }
+
+  if (keyword) {
+    params.keyword = keyword;
   }
 
   const { data } = await basicApi.get<ActivitiesResponse>('activities', {
@@ -82,14 +86,15 @@ const Main = () => {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState('');
   const [sort, setSort] = useState('');
+  const [keyword, setKeyword] = useState(''); // 하나의 검색어 상태로 통합
   const pageSize = 6;
 
   const { data, isPending, isError, error, isFetching } = useQuery<
     ActivitiesResponse,
     Error
   >({
-    queryKey: ['activities', page, category, sort],
-    queryFn: () => fetchActivities(page, pageSize, category, sort),
+    queryKey: ['activities', page, category, sort, keyword],
+    queryFn: () => fetchActivities(page, pageSize, category, sort, keyword),
     placeholderData: keepPreviousData,
   });
 
@@ -109,6 +114,11 @@ const Main = () => {
       setCategory(selectedCategory); // 새로운 카테고리 선택
     }
     setPage(1); // 페이지를 1로 초기화
+  };
+
+  const handleKeywordChange = (selectedKeyword: string) => {
+    setKeyword(selectedKeyword);
+    setPage(1);
   };
 
   const categories = [
@@ -146,6 +156,7 @@ const Main = () => {
           ))}
         </div>
       </div>
+
       <div>
         <select
           value={sort}
@@ -156,6 +167,16 @@ const Main = () => {
           <option value="price_asc">가격 낮은 순</option>
           <option value="price_desc">가격 높은 순</option>
         </select>
+      </div>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => handleKeywordChange(e.target.value)}
+          className="px-3 py-2 border rounded-md mr-2"
+          placeholder="검색어를 입력하세요"
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
