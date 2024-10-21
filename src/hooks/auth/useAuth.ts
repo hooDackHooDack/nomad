@@ -1,25 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserInfo } from '@/types/user/User';
-import basicApi from '@/components/lib/axios/baiscAxios';
+import { UserInfo } from '@/types/user/userInfo';
+import basicApi from '@/components/lib/axios/basic';
+import authApi from '@/components/lib/axios/auth';
 import Cookies from 'js-cookie';
-import authApi from '@/components/lib/axios/AuthAxios';
 
 interface LoginResponse {
   user: UserInfo;
   accessToken: string;
-  refreshToken: string;
-}
-
-async function fetchUserInfo(): Promise<UserInfo | null> {
-  const accessToken = Cookies.get('accessToken');
-  if (!accessToken) return null;
-  try {
-    const { data } = await authApi.get<UserInfo>('/users/me');
-    return data;
-  } catch (error) {
-    console.error('로그인상태가 아닙니다.', error);
-    return null;
-  }
 }
 
 export function useAuth() {
@@ -31,7 +18,17 @@ export function useAuth() {
     error,
   } = useQuery({
     queryKey: ['user'],
-    queryFn: fetchUserInfo,
+    queryFn: async (): Promise<UserInfo | null> => {
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) return null;
+      try {
+        const { data } = await authApi.get<UserInfo>('/users/me');
+        return data;
+      } catch (error) {
+        console.error('로그인상태가 아닙니다.', error);
+        return null;
+      }
+    },
     retry: false,
   });
 
@@ -44,30 +41,27 @@ export function useAuth() {
       return data;
     },
     onSuccess: (data: LoginResponse) => {
-      const { user, accessToken, refreshToken } = data;
+      const { user, accessToken } = data;
+      const now = Date.now();
+
       Cookies.set('accessToken', accessToken);
-      Cookies.set('refreshToken', refreshToken);
+      localStorage.setItem('loginTime', now.toString());
+      localStorage.setItem('lastAuthApiCall', now.toString());
       queryClient.setQueryData(['user'], user);
     },
-    onError: (error) => {
-      console.error('Login failed:', error);
-      // 로그인 실패 에러처리 로직
-    },
+    onError: () => console.log('로그인실패'),
   });
-
-  const logout = () => {
-    Cookies.remove('accessToken');
-    Cookies.remove('refreshToken');
-    queryClient.setQueryData(['user'], null);
-  };
 
   return {
     user,
     isLoading,
     error,
     login: loginMutation.mutate,
-    logout,
     isLoginLoading: loginMutation.isPending,
     loginError: loginMutation.error,
   };
+}
+export function logout() {
+  Cookies.remove('accessToken');
+  window.location.reload();
 }

@@ -6,7 +6,6 @@ export default function Document() {
     <Html lang="ko">
       <Head />
       <body>
-        {/* <Header /> */}
         <Main />
         <NextScript />
       </body>

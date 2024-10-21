@@ -14,10 +14,12 @@
     "@types/js-cookie": "^3.0.6",
     "axios": "^1.7.7",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "next": "14.2.15",
     "prettier": "^3.3.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hook-form": "^7.53.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
