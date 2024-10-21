@@ -1,9 +1,9 @@
-import ActivityCard from "@/components/landing/ActivityCard";
-import basicApi from "@/components/lib/axios/basic";
-import { ActivitiesResponse } from "@/types/activity/activity";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import Pagination from "react-js-pagination";
+import ActivityCard from '@/components/landing/ActivityCard';
+import basicApi from '@/components/lib/axios/basic';
+import { ActivitiesResponse } from '@/types/activity/activity';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import Pagination from 'react-js-pagination';
 
 const fetchActivities = async (
   page: number = 1,
@@ -47,7 +47,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState('');
   const [sort, setSort] = useState('');
-  const [keyword, setKeyword] = useState(''); // 하나의 검색어 상태로 통합
+  const [keyword, setKeyword] = useState('');
   const pageSize = 6;
 
   const { data, isPending, isError, error, isFetching } = useQuery<
@@ -74,7 +74,7 @@ export default function Home() {
     } else {
       setCategory(selectedCategory); // 새로운 카테고리 선택
     }
-    setPage(1); // 페이지를 1로 초기화
+    setPage(1);
   };
 
   const handleKeywordChange = (selectedKeyword: string) => {
@@ -91,7 +91,8 @@ export default function Home() {
     '웰빙',
   ];
 
-  if (isPending) return <div className="text-center py-10">Loading...</div>;
+  if (isPending || isFetching)
+    return <div className="text-center py-10">Loading...</div>;
   if (isError)
     return (
       <div className="text-center py-10 text-red-500">
@@ -161,8 +162,6 @@ export default function Home() {
           />
         )}
       </div>
-
-      {isFetching && <div className="text-center mt-4">Loading...</div>}
     </div>
   );
 }
