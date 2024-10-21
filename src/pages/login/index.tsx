@@ -3,31 +3,12 @@ import Logo from '/public/logo/logo_col.svg';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ErrorResponse } from '@/types/form/error/error';
 import { LoginFormData } from '@/types/form/login/loginForm';
-import Link from 'next/link';
-import GoogleLogo from '/public/icons/social/google.svg';
-import KakaoLogo from '/public/icons/social/kakao.svg';
 import { useState } from 'react';
 import OpenEye from '/public/icons/input/visibility_on.svg';
 import CloseEye from '/public/icons/input/visibility_off.svg';
-
-// 유효성 검사 규칙
-const validationRules = {
-  email: {
-    required: '이메일은 필수 입력입니다',
-    pattern: {
-      value:
-        /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
-      message: '잘못된 이메일 형식입니다.',
-    },
-  },
-  password: {
-    required: '비밀번호는 필수 입력입니다.',
-    minLength: {
-      value: 8,
-      message: '8자 이상 입력해주세요',
-    },
-  },
-};
+import { validationRules } from '@/utils/form/validationRules';
+import SocialBox from '@/components/form/socialBox/SocialBox';
+import AuthSwitcher from '@/components/form/authSwitcher/AuthSwitcher';
 
 export default function Login() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
@@ -172,26 +153,16 @@ export default function Login() {
             </button>
           </div>
         </form>
-        <div className="flex justify-center gap-2 mt-8">
-          <p>회원이 아니신가요?</p>
-          <Link href={'#'} className="underline text-green-dark">
-            회원가입하기
-          </Link>
-        </div>
-
-        <div className="flex flex-col gap-10 mt-10">
-          <div className="relative flex items-center justify-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-xl font-regular text-gray-700">
-              SNS 계정으로 로그인하기
-            </span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
-          <div className="flex gap-4 justify-center">
-            <GoogleLogo />
-            <KakaoLogo />
-          </div>
-        </div>
+        <AuthSwitcher
+          text="회원이 아니신가요?"
+          link="/#"
+          linkText="회원가입하기"
+        />
+        <SocialBox
+          text={'SNS계정으로 로그인하기'}
+          googleClick={() => {}}
+          kakaoClick={() => {}}
+        />
       </div>
     </div>
   );
