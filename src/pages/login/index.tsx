@@ -4,11 +4,10 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { ErrorResponse } from '@/types/form/error/error';
 import { LoginFormData } from '@/types/form/login/loginForm';
 import { useState } from 'react';
-import OpenEye from '/public/icons/input/visibility_on.svg';
-import CloseEye from '/public/icons/input/visibility_off.svg';
 import { validationRules } from '@/utils/form/validationRules';
 import SocialBox from '@/components/form/socialBox/SocialBox';
 import AuthSwitcher from '@/components/form/authSwitcher/AuthSwitcher';
+import FormInput from '@/components/form/input/FormInput';
 
 export default function Login() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
@@ -85,65 +84,26 @@ export default function Login() {
         <Logo className="self-center" />
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-7 mt-14">
-            <div className="flex-col">
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="email"
-                  className="text-lg font-regular text-black"
-                >
-                  이메일
-                </label>
-                <input
-                  className={`border w-full h-14 px-4 ${
-                    errors.email
-                      ? 'border-red focus:border-red focus:outline-none focus:ring-1 focus:ring-red'
-                      : 'border-gray-500 focus:border-green-dark focus:outline-none focus:ring-1 focus:ring-green-dark'
-                  }`}
-                  id="email"
-                  type="email"
-                  placeholder="이메일을 입력해주세요"
-                  {...register('email', validationRules.email)}
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1 text-red text-sm">
-                  {errors.email.message?.toString()}
-                </p>
-              )}
-            </div>
-            <div className="flex-col">
-              <div className="flex flex-col gap-2 relative">
-                <label
-                  htmlFor="password"
-                  className="text-lg font-regular text-black"
-                >
-                  비밀번호
-                </label>
-                <input
-                  className={`border w-full h-14 px-4 ${
-                    errors.password
-                      ? 'border-red focus:border-red focus:outline-none focus:ring-1 focus:ring-red'
-                      : 'border-gray-500 focus:border-green-dark focus:outline-none focus:ring-1 focus:ring-green-dark'
-                  }`}
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="비밀번호를 입력해주세요"
-                  {...register('password', validationRules.password)}
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-4 top-[60px] transform -translate-y-1/2 cursor-pointer border-none"
-                >
-                  {showPassword ? <OpenEye /> : <CloseEye />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-red text-sm">
-                  {errors.password.message?.toString()}
-                </p>
-              )}
-            </div>
+            <FormInput<LoginFormData>
+              label="이메일"
+              name="email"
+              type="email"
+              register={register}
+              error={errors.email}
+              placeholder="이메일을 입력해주세요"
+              validationRule={validationRules.email}
+            />
+            <FormInput<LoginFormData>
+              label="비밀번호"
+              name="password"
+              type="password"
+              register={register}
+              error={errors.password}
+              placeholder="비밀번호를 입력해주세요"
+              showPassword={showPassword}
+              togglePasswordVisibility={togglePasswordVisibility}
+              validationRule={validationRules.password}
+            />
             <button
               type="submit"
               disabled={isButtonDisabled}
