@@ -8,6 +8,7 @@ import SocialBox from '@/components/form/socialBox/SocialBox';
 import AuthSwitcher from '@/components/form/authSwitcher/AuthSwitcher';
 import FormInput from '@/components/form/input/FormInput';
 import { useRouter } from 'next/router';
+import SubmitButton from '@/components/form/submitButton/SubmitButton';
 
 export default function Login() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
@@ -101,13 +102,7 @@ export default function Login() {
               placeholder="비밀번호를 입력해주세요"
               validationRule={validationRules.password}
             />
-            <button
-              type="submit"
-              disabled={isButtonDisabled}
-              className="bg-green-dark text-gray-50 text-lg font-bold py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              로그인 하기
-            </button>
+            <SubmitButton disabled={isButtonDisabled} text="로그인 하기" />
           </div>
         </form>
         <AuthSwitcher

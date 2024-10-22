@@ -9,6 +9,7 @@ import {
 import { validationRules } from '@/utils/form/validationRules';
 import basicApi from '@/components/lib/axios/basic';
 import { AxiosError } from 'axios';
+import SubmitButton from '@/components/form/submitButton/SubmitButton';
 
 export default function SignUp() {
   const {
@@ -91,13 +92,7 @@ export default function SignUp() {
                 value === password || '비밀번호가 일치하지 않습니다.',
             }}
           />
-          <button
-            type="submit"
-            disabled={isButtonDisabled}
-            className="bg-green-dark text-gray-50 text-lg font-bold py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
-          >
-            회원가입 하기
-          </button>
+          <SubmitButton disabled={isButtonDisabled} text="회원가입 하기" />
         </div>
       </form>
     </div>
