@@ -14,7 +14,7 @@ const LandingPage = () => {
           <Logo />
         </motion.div>
         <motion.p
-          className="text-xl md:text-2xl text-white mb-8 mt-8 text-center"
+          className="text-xl md:text-2xl mb-8 mt-8 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 2 }}
