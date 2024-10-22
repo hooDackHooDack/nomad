@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useAuth, logout } from '@/hooks/auth/useAuth';
+import Logo from '/public/logo/logo_row.svg';
 
 const Header = () => {
   /**
@@ -15,7 +16,9 @@ const Header = () => {
   return (
     <div className="w-full mx-auto border-b-[1px] border-gray-200">
       <div className="max-w-[1200px] flex justify-between p-5 mx-auto">
-        <Link href="/">똘망똘망</Link>
+        <Link href="/">
+          <Logo />
+        </Link>
         <div className="flex gap">
           {user ? (
             <div>
