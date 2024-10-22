@@ -52,6 +52,7 @@ const config: Config = {
         light2: '#E3F3FF',
       },
       transparent: 'transparent',
+      white: '#FFFFFF',
     },
     fontSize: {
       xs: ['12px', '18px'],
@@ -68,6 +69,29 @@ const config: Config = {
       medium: '500',
       semibold: '600',
       bold: '700',
+    },
+    extend: {
+      keyframes: {
+        show: {
+          '0%, 49.99%': { opacity: '0', zIndex: '1' },
+          '50%, 100%': { opacity: '1', zIndex: '5' },
+        },
+      },
+      animation: {
+        show: 'show 0.6s',
+      },
+      transitionDuration: {
+        '600': '600ms',
+      },
+      boxShadow: {
+        auth: '0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)',
+      },
+      zIndex: {
+        '1': '1',
+        '2': '2',
+        '5': '5',
+        '100': '100',
+      },
     },
   },
   plugins: [],
