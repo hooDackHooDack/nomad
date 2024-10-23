@@ -8,7 +8,7 @@ interface Props {
   timer?: number;
   showCancelButton?: boolean;
   cancelButtonText?: string;
-  confiremdFunction?: () => void;
+  confirmedFunction?: () => void;
 }
 
 /**
@@ -30,7 +30,7 @@ export function alertModal({
   confirmButtonText,
   cancelButtonText,
   timer,
-  confiremdFunction,
+  confirmedFunction,
 }: Props) {
   Swal.fire({
     title: title,
@@ -45,8 +45,8 @@ export function alertModal({
       confirmButton: 'text-[#FAFAFA]',
     },
   }).then((result) => {
-    if (result.isConfirmed && confiremdFunction) {
-      confiremdFunction();
+    if (result.isConfirmed && confirmedFunction) {
+      confirmedFunction();
     } else if (result.dismiss === Swal.DismissReason.cancel) {
       console.log('취소되었습니다.');
     }
