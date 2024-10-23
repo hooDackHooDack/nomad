@@ -25,7 +25,7 @@ const Header = () => {
               <p>{user.nickname}</p> <button onClick={logout}>로그아웃</button>
             </div>
           ) : (
-            <Link href="/auth">로그인</Link>
+            <Link href="/auth/login">로그인</Link>
           )}
         </div>
       </div>
