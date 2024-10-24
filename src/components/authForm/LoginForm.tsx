@@ -25,8 +25,8 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
     login(
       {
-        email: formData.email,
-        password: formData.password,
+        email: formData.loginEmail,
+        password: formData.loginPassword,
       },
       {
         onError: (error) => {
@@ -65,19 +65,19 @@ export default function LoginForm() {
         <div className="flex flex-col gap-7">
           <FormInput<LoginFormData>
             label="이메일"
-            name="email"
+            name="loginEmail"
             type="email"
             register={register}
-            error={errors.email}
+            error={errors.loginEmail}
             placeholder="이메일을 입력해주세요"
             validationRule={validationRules.email}
           />
           <FormInput<LoginFormData>
             label="비밀번호"
-            name="password"
+            name="loginPassword"
             type="password"
             register={register}
-            error={errors.password}
+            error={errors.loginPassword}
             placeholder="비밀번호를 입력해주세요"
             validationRule={validationRules.password}
           />
