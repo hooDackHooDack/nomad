@@ -54,7 +54,7 @@ export default function LoginForm() {
   };
 
   if (isLoading) return null;
-  if (user) router.push('/');
+  if (user) router.push('/list');
 
   return (
     <div className="w-full flex flex-col">
