@@ -6,7 +6,7 @@ import {
   SignUpResponse,
 } from '@/types/form/sign-up/signUpForm';
 import { validationRules } from '@/utils/form/validationRules';
-import basicApi from '@/components/lib/axios/basic';
+import basicApi from '@/lib/axios/basic';
 import { AxiosError } from 'axios';
 import SubmitButton from '@/components/form/submitButton/SubmitButton';
 import SocialBox from '../form/socialBox/SocialBox';
