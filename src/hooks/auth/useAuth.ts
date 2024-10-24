@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserInfo } from '@/types/user/userInfo';
-import basicApi from '@/components/lib/axios/basic';
-import authApi from '@/components/lib/axios/auth';
+import basicApi from '@/lib/axios/basic';
+import authApi from '@/lib/axios/auth';
 import Cookies from 'js-cookie';
 
 interface LoginResponse {

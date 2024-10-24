@@ -1,5 +1,5 @@
 import ActivityCard from '@/components/landing/ActivityCard';
-import basicApi from '@/components/lib/axios/basic';
+import basicApi from '@/lib/axios/basic';
 import { ActivitiesResponse } from '@/types/activity/activity';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -109,7 +109,6 @@ export default function Home() {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    
   };
 
   if (isPending || isFetching)
