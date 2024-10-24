@@ -9,7 +9,7 @@ interface Props {
 
 const SocialBox = ({ text, googleClick, kakaoClick }: Props) => {
   return (
-    <div className="flex flex-col gap-8 mt-10">
+    <div className="flex flex-col gap-4 mt-10">
       <div className="relative flex items-center justify-center">
         <div className="flex-grow border-t border-gray-300"></div>
         <span className="flex-shrink mx-4 text-xl font-regular text-gray-700">

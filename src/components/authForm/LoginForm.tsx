@@ -7,6 +7,7 @@ import FormInput from '@/components/form/input/FormInput';
 import { useRouter } from 'next/router';
 import SubmitButton from '@/components/form/submitButton/SubmitButton';
 import SocialBox from '../form/socialBox/SocialBox';
+import { alertModal } from '@/utils/alert/alertModal';
 
 export default function LoginForm() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
@@ -24,17 +25,27 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<LoginFormData> = async (formData) => {
     login(
       {
-        email: formData.email,
-        password: formData.password,
+        email: formData.loginEmail,
+        password: formData.loginPassword,
       },
       {
         onError: (error) => {
           const err = error as ErrorResponse;
           if (err.response) {
             if (err.response.status === 404) {
-              alert('존재하지 않는 이메일입니다.');
+              alertModal({
+                text: '존재하지 않는 이메일 입니다.',
+                icon: 'warning',
+                confirmButtonText: '확인',
+                timer: 2400,
+              });
             } else if (err.response.status === 400) {
-              alert('비밀번호가 일치하지 않습니다.');
+              alertModal({
+                text: '비밀번호가 일치하지 않습니다.',
+                icon: 'warning',
+                confirmButtonText: '확인',
+                timer: 2400,
+              });
             }
           }
         },
@@ -43,7 +54,7 @@ export default function LoginForm() {
   };
 
   if (isLoading) return null;
-  if (user) router.push('/');
+  if (user) router.push('/list');
 
   return (
     <div className="w-full flex flex-col">
@@ -54,19 +65,19 @@ export default function LoginForm() {
         <div className="flex flex-col gap-7">
           <FormInput<LoginFormData>
             label="이메일"
-            name="email"
+            name="loginEmail"
             type="email"
             register={register}
-            error={errors.email}
+            error={errors.loginEmail}
             placeholder="이메일을 입력해주세요"
             validationRule={validationRules.email}
           />
           <FormInput<LoginFormData>
             label="비밀번호"
-            name="password"
+            name="loginPassword"
             type="password"
             register={register}
-            error={errors.password}
+            error={errors.loginPassword}
             placeholder="비밀번호를 입력해주세요"
             validationRule={validationRules.password}
           />

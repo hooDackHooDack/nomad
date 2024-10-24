@@ -1,8 +1,8 @@
 export interface SignUpFormData {
-  email: string;
-  nickname: string;
-  password: string;
-  passwordConfirm: string;
+  signupEmail: string;
+  signupNickname: string;
+  signupPassword: string;
+  signupPasswordConfirm: string;
 }
 
 export interface SignUpResponse {
