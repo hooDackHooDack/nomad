@@ -2,10 +2,32 @@ import { useFormContext } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { ExperienceFormData } from '@/types/activity/activity';
 import FormInput from '@/components/form/input/FormInput';
+import RadioGroupInput from '@/components/form/radioGroup/radioGroupInput';
+import FormEditor from '@/components/form/editor/FormEditor';
+
+const categoryOptions = [
+  { value: '문화·예술', label: '문화·예술' },
+  { value: '식음료', label: '식음료' },
+  { value: '스포츠', label: '스포츠' },
+  { value: '투어', label: '투어' },
+  { value: '관광', label: '관광' },
+  { value: '웰빙', label: '웰빙' },
+];
 
 export default function BasicStep() {
-  const { register, formState: { errors } } = useFormContext<ExperienceFormData>();
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useFormContext<ExperienceFormData>();
+
   const router = useRouter();
+  const description = watch('description');
+
+  const handleEditorChange = (content: string) => {
+    setValue('description', content); // HTML 형태로 저장
+  };
 
   return (
     <div className="space-y-6">
@@ -20,37 +42,25 @@ export default function BasicStep() {
           placeholder="제목을 입력해주세요"
         />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            카테고리
-          </label>
-          <select
-            {...register('category')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">카테고리 선택</option>
-            <option value="문화 · 예술">문화 · 예술</option>
-            <option value="식음료">식음료</option>
-            <option value="스포츠">스포츠</option>
-            <option value="투어">투어</option>
-            <option value="관광">관광</option>
-            <option value="웰빙">웰빙</option>
-          </select>
-        </div>
+        <RadioGroupInput<ExperienceFormData>
+          label="카테고리"
+          name="category"
+          register={register}
+          options={categoryOptions}
+          error={errors.category}
+          validationRule={{ required: '카테고리를 선택해주세요' }}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">설명</label>
-          <textarea
-            {...register('description')}
-            rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="체험에 대한 설명을 입력해주세요"
-          />
-        </div>
+        <FormEditor
+          value={description || ''} // null/undefined 처리
+          onChange={handleEditorChange}
+          error={errors.description}
+        />
       </div>
 
       <div className="flex justify-end mt-6">
         <button
+          type="button" // 버튼 타입 추가
           onClick={() => router.push('/activity/create/images')}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
