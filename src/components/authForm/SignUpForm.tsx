@@ -10,6 +10,8 @@ import basicApi from '@/components/lib/axios/basic';
 import { AxiosError } from 'axios';
 import SubmitButton from '@/components/form/submitButton/SubmitButton';
 import SocialBox from '../form/socialBox/SocialBox';
+import { alertModal } from '@/utils/alert/alertModal';
+import { useRouter } from 'next/router';
 
 export default function SignUp() {
   const {
@@ -21,7 +23,7 @@ export default function SignUp() {
     mode: 'onSubmit',
   });
   const password = watch('password');
-
+  const router = useRouter();
   const onSubmit: SubmitHandler<SignUpFormData> = async (formData) => {
     const { email, nickname, password } = formData;
     try {
@@ -30,18 +32,30 @@ export default function SignUp() {
         nickname,
         password,
       });
-      alert(`회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.`);
+      alertModal({
+        icon: 'success',
+        text: '가입이 완료되었습니다!',
+        confirmButtonText: '확인',
+        timer: 2400,
+      });
+      router.push('/auth/login');
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 409) {
-          alert('이미 가입된 이메일입니다.');
-          return;
+          alertModal({
+            icon: 'warning',
+            text: '이미 가입된 이메일입니다.',
+            confirmButtonText: '확인',
+            timer: 2400,
+          });
         }
-        alert(
-          error.response?.data?.message || '회원가입 중 오류가 발생했습니다.',
-        );
       } else {
-        alert('회원가입 중 오류가 발생했습니다.');
+        alertModal({
+          icon: 'error',
+          text: '회원가입중 오류가 발생했습니다. 다시 시도해주세요',
+          confirmButtonText: '확인',
+          timer: 3000,
+        });
       }
     }
   };

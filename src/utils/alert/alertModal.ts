@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 
 interface Props {
-  title: string;
+  title?: string;
   text?: string;
   icon?: 'success' | 'error' | 'warning' | 'info' | 'question';
   confirmButtonText?: string;
