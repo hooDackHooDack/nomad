@@ -22,15 +22,15 @@ export default function SignUp() {
   } = useForm<SignUpFormData>({
     mode: 'onSubmit',
   });
-  const password = watch('password');
+  const password = watch('signupPassword');
   const router = useRouter();
   const onSubmit: SubmitHandler<SignUpFormData> = async (formData) => {
-    const { email, nickname, password } = formData;
+    const { signupEmail, signupNickname, signupPassword } = formData;
     try {
       await basicApi.post<SignUpResponse>('/users', {
-        email,
-        nickname,
-        password,
+        email: signupEmail,
+        nickname: signupNickname,
+        password: signupPassword,
       });
       alertModal({
         icon: 'success',
@@ -54,7 +54,7 @@ export default function SignUp() {
           icon: 'error',
           text: '회원가입중 오류가 발생했습니다. 다시 시도해주세요',
           confirmButtonText: '확인',
-          timer: 3000,
+          timer: 2400,
         });
       }
     }
@@ -70,37 +70,37 @@ export default function SignUp() {
         <div className="flex flex-col gap-2">
           <FormInput<SignUpFormData>
             label="이메일"
-            name="email"
+            name="signupEmail"
             type="email"
             register={register}
-            error={errors.email}
+            error={errors.signupEmail}
             placeholder="이메일을 입력해주세요"
             validationRule={validationRules.email}
           />
           <FormInput<SignUpFormData>
             label="닉네임"
-            name="nickname"
+            name="signupNickname"
             type="text"
             register={register}
-            error={errors.nickname}
+            error={errors.signupNickname}
             placeholder="닉네임을 입력해주세요"
             validationRule={validationRules.nickname}
           />
           <FormInput<SignUpFormData>
             label="비밀번호"
-            name="password"
+            name="signupPassword"
             type="password"
             register={register}
-            error={errors.password}
+            error={errors.signupPassword}
             placeholder="비밀번호를 입력해주세요"
             validationRule={validationRules.password}
           />
           <FormInput<SignUpFormData>
             label="비밀번호 확인"
-            name="passwordConfirm"
+            name="signupPasswordConfirm"
             type="password"
             register={register}
-            error={errors.passwordConfirm}
+            error={errors.signupPasswordConfirm}
             placeholder="비밀번호를 한번 더 입력해주세요"
             validationRule={{
               required: '비밀번호 확인은 필수입니다.',
