@@ -74,7 +74,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       case 'images':
         // 필수 이미지가 모두 업로드되어야 완료
         return Boolean(
-          formValues.bannerImage && formValues.bannerImage.length > 0,
+          formValues.bannerImageUrl && formValues.bannerImageUrl.length > 0,
         );
 
       default:

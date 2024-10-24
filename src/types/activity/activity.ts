@@ -57,11 +57,12 @@ export interface ExperienceFormData {
   category: string;
   description: string;
   address: string;
-  bannerImage: FileList;
-  subImages: FileList[];
-  schedules: {
+  schedules: Array<{
     date: string;
-    times: { startTime: string; endTime: string }[];
-  }[];
-  price: number;
+    times: Array<{ startTime: string; endTime: string }>;
+  }>;
+  bannerImageUrl: string | null;
+  subImages: string[];
+  bannerPreview: string;
+  subPreviews: string[];
 }
