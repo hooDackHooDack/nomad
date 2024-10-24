@@ -25,6 +25,9 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const formValues = methods.watch();
+  const handleSubmit = methods.handleSubmit((formdata) =>
+    console.log(formdata),
+  );
 
   // 현재 경로에서 단계 ID 추출
   const getCurrentStepId = () => {
@@ -151,34 +154,39 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-3">
-              <nav className="sticky top-8 space-y-1">
-                {steps.map((step) => {
-                  const status = getStepStatus(step.id);
-                  return (
-                    <Link
-                      key={step.id}
-                      href={step.path}
-                      className={getStepStyles(status)}
-                    >
-                      <span className="mr-3">{getStepIcon(status)}</span>
-                      <span className="flex-1">{step.title}</span>
-                      {getStepStatusText(status)}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
+      <form onSubmit={handleSubmit}>
+        {/* form 태그 추가 및 onSubmit 이벤트 추가 */}
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="grid grid-cols-12 gap-8">
+              <div className="col-span-3">
+                <nav className="sticky top-8 space-y-1">
+                  {steps.map((step) => {
+                    const status = getStepStatus(step.id);
+                    return (
+                      <Link
+                        key={step.id}
+                        href={step.path}
+                        className={getStepStyles(status)}
+                      >
+                        <span className="mr-3">{getStepIcon(status)}</span>
+                        <span className="flex-1">{step.title}</span>
+                        {getStepStatusText(status)}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
 
-            <div className="col-span-9">
-              <div className="bg-white shadow rounded-lg p-6">{children}</div>
+              <div className="col-span-9">
+                <div className="bg-white shadow rounded-lg p-6">{children}</div>
+              </div>
             </div>
           </div>
+          <button type="button">임시저장</button>
+          <button type="submit">등록하기</button>
         </div>
-      </div>
+      </form>
     </FormProvider>
   );
 };
