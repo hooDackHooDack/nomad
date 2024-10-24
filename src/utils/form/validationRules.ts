@@ -30,3 +30,29 @@ export const validationRules = {
     },
   },
 };
+
+export const experienceValidationRules = {
+  title: {
+    required: '제목을 입력해주세요',
+    minLength: { value: 5, message: '최소 5자 이상 입력해주세요' },
+    maxLength: { value: 50, message: '최대 50자까지 입력 가능합니다' },
+  },
+  category: {
+    required: '카테고리를 선택해주세요',
+  },
+  description: {
+    required: '설명을 입력해주세요',
+    minLength: { value: 20, message: '최소 20자 이상 입력해주세요' },
+    maxLength: { value: 500, message: '최대 500자까지 입력 가능합니다' },
+  },
+  address: {
+    required: '주소를 입력해주세요',
+  },
+  bannerImage: {
+    required: '배너 이미지를 업로드해주세요',
+  },
+  price: {
+    required: '가격을 입력해주세요',
+    min: { value: 0, message: '0원 이상 입력해주세요' },
+  },
+};
