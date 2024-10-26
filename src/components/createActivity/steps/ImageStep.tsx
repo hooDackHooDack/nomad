@@ -123,7 +123,7 @@ const ImageUploadComponent = () => {
         <div className="relative">
           <label className="block">
             {!bannerPreview ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 cursor-pointer hover:border-gray-400 transition-colors">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-28 cursor-pointer hover:border-gray-400 transition-colors">
                 <div className="flex flex-col items-center">
                   <PlusIcon className="w-8 h-8 text-gray-400" />
                   <span className="mt-2 text-sm text-gray-500">
