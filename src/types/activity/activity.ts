@@ -1,3 +1,20 @@
+// API 요청 타입
+export interface ActivityFormInput {
+  title: string;
+  category: string;
+  description: string;
+  address: string;
+  price: number;
+  schedules: Array<{
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
+  bannerImageUrl: string;
+  subImageUrls: string[];
+}
+
+// API 응답 타입
 export interface Activity {
   id: number;
   userId: number;
@@ -11,30 +28,34 @@ export interface Activity {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
+  schedules: ActivitySchedule[];
+  subImages: ActivitySubImage[];
 }
 
-export interface ActivitiesResponse {
-  activities: Activity[];
-  totalCount: number;
+export interface ActivitySchedule {
+  date: string;
+  times: ActivityTime[];
 }
 
-export interface Time {
+export interface ActivityTime {
   id: number;
   startTime: string;
   endTime: string;
 }
 
-export interface Schedule {
-  date: string;
-  times: Time[];
-}
-
-export interface SubImage {
+export interface ActivitySubImage {
   id: number;
   imageUrl: string;
 }
 
-export interface Experience {
+// 활동 목록 조회 응답 타입
+export interface ActivitiesResponse {
+  activities: Activity[];
+  totalCount: number;
+}
+
+// 활동 목록 아이템 타입
+export interface ActivityItem {
   id: number;
   userId: number;
   title: string;
@@ -47,19 +68,21 @@ export interface Experience {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
-  subImages: SubImage[];
-  schedules: Schedule[];
 }
 
-// 폼 입력용 타입 - API 응답과 분리
+// 폼 상태 관리용 타입
 export interface ExperienceFormData {
   title: string;
   category: string;
   description: string;
   address: string;
+  price: number;
   schedules: Array<{
     date: string;
-    times: Array<{ startTime: string; endTime: string }>;
+    times: Array<{
+      startTime: string;
+      endTime: string;
+    }>;
   }>;
   bannerImageUrl: string | null;
   subImages: string[];
