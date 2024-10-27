@@ -2,7 +2,6 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/form/input/FormInput';
 import { ExperienceFormData } from '@/types/activity/activity';
-import Script from 'next/script';
 
 declare global {
   interface Window {
@@ -10,7 +9,11 @@ declare global {
   }
 }
 
-const AddressSearch = () => {
+interface AddressSearchProps {
+  onAddressChange?: (address: string) => void;
+}
+
+const AddressSearch: React.FC<AddressSearchProps> = ({ onAddressChange }) => {
   const {
     register,
     setValue,
@@ -28,9 +31,9 @@ const AddressSearch = () => {
 
     new window.daum.Postcode({
       oncomplete: function (data: any) {
-        // 도로명 주소 우선, 없으면 지번 주소 사용
         const address = data.roadAddress || data.jibunAddress;
         setValue('address', address);
+        onAddressChange?.(address); // 부모 컴포넌트에 주소 변경 알림
       },
       width: '100%',
       height: '100%',
@@ -39,16 +42,14 @@ const AddressSearch = () => {
 
   return (
     <div>
-      <Script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" />
-
-      <div className="w-full">
+      <div className="w-full mt-4">
         <FormInput<ExperienceFormData>
           label="주소"
           name="address"
           type="text"
           register={register}
           error={errors.address}
-          placeholder="주소를 입력해주세요"
+          placeholder="도로명 주소를 입력해 주세요"
           readOnly
           onClick={handleAddressSearch}
           value={address}
