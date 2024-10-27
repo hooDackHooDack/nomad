@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Plus, Trash2, Calendar, Clock } from 'lucide-react';
 import type { ExperienceFormData } from '@/types/activity/activity';
-import TimeInput from '@/components/form/schedule/TimeInput';
+import TimeInput from '@/components/form/input/schedule/TimeInput';
 import { formatTime } from '@/utils/schedule/timeFormat';
-import TimePicker from '@/components/form/schedule/TimePicker';
+import TimePicker from '@/components/form/input/schedule/TimePicker';
+import { alertModal } from '@/utils/alert/alertModal';
 
 const ScheduleStep = () => {
   const { watch, setValue } = useFormContext<ExperienceFormData>();
@@ -25,7 +26,12 @@ const ScheduleStep = () => {
 
   const addSchedule = () => {
     if (!tempDate || !tempStartTime || !tempEndTime) {
-      alert('날짜와 시간을 모두 선택해주세요.');
+      alertModal({
+        text: '날짜와 시간을 모두 선택해주세요.',
+        icon: 'error',
+        confirmButtonText: '확인',
+        timer: 2400,
+      });
       return;
     }
 
