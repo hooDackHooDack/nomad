@@ -1,37 +1,18 @@
-import { useFormContext } from 'react-hook-form';
-import { useRouter } from 'next/router';
-import { ExperienceFormData } from '@/types/activity/activity';
-import FormInput from '@/components/form/input/FormInput';
+import AddressSearch from '@/components/kakao/AddressSearch';
 
-export default function LoactionStep() {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext<ExperienceFormData>();
-  const router = useRouter();
-
+export default function LocationStep() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">주소</h1>
-      <div className="space-y-4">
-        <FormInput<ExperienceFormData>
-          label="주소"
-          name="address"
-          type="text"
-          register={register}
-          error={errors.address}
-          placeholder="주소를 입력해주세요"
-        />
-      </div>
+    <>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">주소</h1>
+        <div className="space-y-4">
+          <div className="flex space-x-2">
+            <AddressSearch />
+          </div>
+        </div>
 
-      <div className="flex justify-end mt-6">
-        <button
-          onClick={() => router.push('/activity/create/images')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          다음
-        </button>
+        <div className="flex justify-end mt-6"></div>
       </div>
-    </div>
+    </>
   );
 }
