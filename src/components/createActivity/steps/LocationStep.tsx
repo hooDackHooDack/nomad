@@ -1,5 +1,5 @@
 import React from 'react';
-import AddressSearch from '@/components/form/input/AddressInput';
+import AddressSearch from '@/components/form/input/addressSearch/AddressInput';
 import KakaoMap from '@/components/kakaoMap/KakaoMap';
 import { useState } from 'react';
 
