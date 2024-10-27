@@ -18,6 +18,9 @@ type InputProps<TFormValues extends FieldValues> = {
   error?: FieldError;
   type: InputType;
   placeholder?: string;
+  readOnly?: boolean;
+  onClick?: () => void;
+  value?: string;
   validationRule?: RegisterOptions<TFormValues, Path<TFormValues>>;
 };
 
@@ -29,6 +32,9 @@ function FormInput<TFormValues extends FieldValues>({
   error,
   placeholder,
   validationRule,
+  readOnly,
+  onClick,
+  value,
 }: InputProps<TFormValues>) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,6 +50,9 @@ function FormInput<TFormValues extends FieldValues>({
       placeholder,
       className: `${inputClassName} ${type === 'textarea' ? 'h-32 py-2' : 'h-14'}`,
       id: name,
+      readOnly,
+      onClick,
+      value,
     };
 
     if (type === 'textarea') {
