@@ -3,6 +3,7 @@ import { PlusIcon, XIcon } from 'lucide-react';
 import { ExperienceFormData } from '@/types/activity/activity';
 import authApi from '@/lib/axios/auth';
 import Link from 'next/link';
+import { alertModal } from '@/utils/alert/alertModal';
 
 interface ImageUploadResponse {
   activityImageUrl: string;
@@ -56,8 +57,14 @@ const ImageUploadComponent = () => {
 
         const imageUrl = await uploadImage(file);
         setValue('bannerImageUrl', imageUrl, { shouldDirty: true });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Banner upload error:', error);
+        alertModal({
+          text: '배너 이미지 업로드에 실패했습니다.',
+          icon: 'error',
+          confirmButtonText: '확인',
+          timer: 2400,
+        });
       }
     }
   };
@@ -93,8 +100,14 @@ const ImageUploadComponent = () => {
 
       setValue('subImages', newSubImages, { shouldDirty: true });
       setValue('subPreviews', newSubPreviews, { shouldDirty: true });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Sub images upload error:', error);
+      alertModal({
+        text: '소개 이미지 업로드에 실패했습니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+        timer: 2400,
+      });
     }
   };
 
