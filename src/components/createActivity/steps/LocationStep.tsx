@@ -1,18 +1,24 @@
-import AddressSearch from '@/components/kakao/AddressSearch';
+import React from 'react';
+import AddressSearch from '@/components/form/input/AddressInput';
+import KakaoMap from '@/components/kakaoMap/KakaoMap';
+import { useState } from 'react';
 
 export default function LocationStep() {
-  return (
-    <>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">주소</h1>
-        <div className="space-y-4">
-          <div className="flex space-x-2">
-            <AddressSearch />
-          </div>
-        </div>
+  const [currentAddress, setCurrentAddress] = useState<string>();
 
-        <div className="flex justify-end mt-6"></div>
+  const handleAddressChange = (address: string) => {
+    setCurrentAddress(address);
+  };
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">체험 주소</h1>
+      <div className="flex flex-col gap-4">
+        <AddressSearch onAddressChange={handleAddressChange} />
+        <KakaoMap address={currentAddress} />
       </div>
-    </>
+
+      <div className="flex justify-end mt-6" />
+    </div>
   );
 }
