@@ -2,6 +2,8 @@
  * @Todo modify TimePicker Modal component
  */
 
+import { formatTime } from "@/utils/schedule/timeFormat";
+
 interface TimePickerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,7 +24,7 @@ const TimePicker = ({
   if (!isOpen) return null;
 
   const generateTimeBlocks = () => {
-    const times = [];
+    const times: { value: string; label: string }[] = [];
     const [minHour] = minTime.split(':').map(Number);
     const [maxHour] = maxTime.split(':').map(Number);
 
@@ -30,11 +32,9 @@ const TimePicker = ({
       for (let minute = 0; minute < 60; minute += 30) {
         const timeValue = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         if (timeValue >= minTime && timeValue <= maxTime) {
-          const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-          const ampm = hour < 12 ? '오전' : '오후';
           times.push({
             value: timeValue,
-            label: `${ampm} ${displayHour}:${minute.toString().padStart(2, '0')}`,
+            label: formatTime(timeValue),
           });
         }
       }
