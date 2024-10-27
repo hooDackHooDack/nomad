@@ -1,4 +1,3 @@
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/form/input/FormInput';
 import { ExperienceFormData } from '@/types/activity/activity';
@@ -13,7 +12,7 @@ interface AddressSearchProps {
   onAddressChange?: (address: string) => void;
 }
 
-const AddressSearch: React.FC<AddressSearchProps> = ({ onAddressChange }) => {
+const AddressSearch = ({ onAddressChange }: AddressSearchProps) => {
   const {
     register,
     setValue,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface KakaoMapProps {
   address?: string;
@@ -13,12 +13,12 @@ declare global {
   }
 }
 
-export const KakaoMap: React.FC<KakaoMapProps> = ({
+export const KakaoMap = ({
   address,
   defaultLat = 37.5666805, // 기본값: 서울 시청
   defaultLng = 126.9784147,
   className = 'w-full h-96 rounded-lg border bg-gray-100',
-}) => {
+}: KakaoMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstance = useRef<any>(null);
