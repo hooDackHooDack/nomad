@@ -9,7 +9,7 @@ interface ImageUploadResponse {
   activityImageUrl: string;
 }
 
-const ImageUploadComponent = () => {
+const ImageUploadStep = () => {
   const { setValue, watch, register } = useFormContext<ExperienceFormData>();
 
   // register로 폼 필드 등록
@@ -57,7 +57,7 @@ const ImageUploadComponent = () => {
 
         const imageUrl = await uploadImage(file);
         setValue('bannerImageUrl', imageUrl, { shouldDirty: true });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         alertModal({
           text: '배너 이미지 업로드에 실패했습니다.',
@@ -100,7 +100,7 @@ const ImageUploadComponent = () => {
 
       setValue('subImages', newSubImages, { shouldDirty: true });
       setValue('subPreviews', newSubPreviews, { shouldDirty: true });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       alertModal({
         text: '소개 이미지 업로드에 실패했습니다.',
@@ -234,4 +234,4 @@ const ImageUploadComponent = () => {
   );
 };
 
-export default ImageUploadComponent;
+export default ImageUploadStep;
