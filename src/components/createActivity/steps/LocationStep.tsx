@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { ExperienceFormData } from '@/types/activity/activity';
 import FormInput from '@/components/form/input/FormInput';
 
-export default function BasicStep() {
+export default function LoactionStep() {
   const {
     register,
     formState: { errors },
