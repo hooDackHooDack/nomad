@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { ExperienceFormData } from '@/types/activity/activity';
 import FormInput from '@/components/form/input/FormInput';
-import RadioGroupInput from '@/components/form/radioGroup/radioGroupInput';
+import RadioGroupInput from '@/components/form/input/radioGroup/RadioInput';
 import FormEditor from '@/components/form/editor/FormEditor';
 
 const categoryOptions = [
