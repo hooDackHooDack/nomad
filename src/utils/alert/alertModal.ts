@@ -9,6 +9,7 @@ interface Props {
   showCancelButton?: boolean;
   cancelButtonText?: string;
   confirmedFunction?: () => void;
+  confirmedDismiss?: () => void; // 취소 버튼 클릭 시 실행될 함수
 }
 
 /**
@@ -31,6 +32,7 @@ export function alertModal({
   cancelButtonText,
   timer,
   confirmedFunction,
+  confirmedDismiss,
 }: Props) {
   Swal.fire({
     title: title,
@@ -47,7 +49,11 @@ export function alertModal({
   }).then((result) => {
     if (result.isConfirmed && confirmedFunction) {
       confirmedFunction();
-    } else if (result.dismiss === Swal.DismissReason.cancel) {
+    } else if (
+      result.dismiss === Swal.DismissReason.cancel &&
+      confirmedDismiss
+    ) {
+      confirmedDismiss();
       console.log('취소되었습니다.');
     }
   });

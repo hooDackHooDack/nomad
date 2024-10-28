@@ -28,6 +28,7 @@ const Header = () => {
             <Link href="/auth/login">로그인</Link>
           )}
         </div>
+        <Link href="/activity/create/basic">체험등록만들기</Link>
       </div>
     </div>
   );

@@ -1,19 +1,41 @@
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { CircleCheckIcon, CircleDotIcon, Circle } from 'lucide-react';
 import { ExperienceFormData } from '@/types/activity/activity';
+import Image from 'next/image';
+import { alertModal } from '@/utils/alert/alertModal';
 
 const steps = [
-  { id: 'basic', title: '기본 정보', path: '/activity/create/basic' },
-  { id: 'location', title: '주소', path: '/activity/create/location' },
-  { id: 'schedule', title: '일정', path: '/activity/create/schedule' },
-  { id: 'images', title: '이미지', path: '/activity/create/images' },
+  {
+    id: 'basic',
+    title: '기본 정보',
+    path: '/activity/create/basic',
+    image: '/images/number/one.png',
+  },
+  {
+    id: 'location',
+    title: '주소',
+    path: '/activity/create/location',
+    image: '/images/number/two.png',
+  },
+  {
+    id: 'schedule',
+    title: '일정',
+    path: '/activity/create/schedule',
+    image: '/images/number/three.png',
+  },
+  {
+    id: 'images',
+    title: '이미지',
+    path: '/activity/create/images',
+    image: '/images/number/four.png',
+  },
 ];
 
 const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const methods = useForm<ExperienceFormData>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     defaultValues: {
       title: '',
       category: '',
@@ -25,157 +47,274 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const formValues = methods.watch();
-  const handleSubmit = methods.handleSubmit((formdata) =>
-    console.log(formdata),
-  );
+  const { reset } = methods;
+  const [alertShown, setAlertShown] = useState(false);
 
-  // 현재 경로에서 단계 ID 추출
+  useEffect(() => {
+    const checkDraftData = () => {
+      const draftData = localStorage.getItem('activityFormDraft');
+
+      if (draftData && !alertShown) {
+        // alertShown 상태 확인
+        try {
+          const { data } = JSON.parse(draftData);
+
+          // 현재 경로가 basic인지 확인
+          const currentPath = router.asPath;
+          const isBasicPath = currentPath.includes('/activity/create/basic');
+
+          if (isBasicPath) {
+            alertModal({
+              icon: 'info',
+              text: '기존에 작성 중인 글이 존재합니다. 이어서 작성하시겠습니까?',
+              showCancelButton: true,
+              confirmButtonText: '이어서 작성하기',
+              cancelButtonText: '임시저장 삭제하기',
+              confirmedFunction: () => {
+                reset(data);
+              },
+              confirmedDismiss: () => {
+                localStorage.removeItem('activityFormDraft');
+              },
+            });
+            setAlertShown(true); // 경고창을 한 번 표시한 후 상태를 업데이트
+          }
+        } catch (error) {
+          console.error('Draft data parsing error:', error);
+          localStorage.removeItem('activityFormDraft');
+
+          alertModal({
+            icon: 'error',
+            text: '임시저장된 데이터를 불러오는데 실패했습니다.',
+            confirmButtonText: '확인',
+          });
+        }
+      }
+    };
+
+    // router가 준비되었을 때만 실행
+    if (router.isReady) {
+      checkDraftData();
+    }
+  }, [router.isReady, router.asPath, reset, alertShown]);
+
+  // 24시간이 지난 임시저장 데이터 자동 삭제
+  useEffect(() => {
+    const cleanupDraftData = () => {
+      const draftData = localStorage.getItem('activityFormDraft');
+
+      if (draftData) {
+        try {
+          const { timestamp } = JSON.parse(draftData);
+          const savedTime = new Date(timestamp).getTime();
+          const currentTime = new Date().getTime();
+          const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
+
+          if (hoursDiff >= 24) {
+            localStorage.removeItem('activityFormDraft');
+          }
+        } catch (error) {
+          console.error('Draft cleanup error:', error);
+          localStorage.removeItem('activityFormDraft');
+        }
+      }
+    };
+
+    cleanupDraftData();
+  }, []);
+
+  const validateBasicStep = () => {
+    const { title, category, description } = formValues;
+    return Boolean(title?.trim() && category?.trim() && description?.trim());
+  };
+
+  const validateLocationStep = () => {
+    return Boolean(formValues.address?.trim());
+  };
+
+  const validateScheduleStep = () => {
+    return formValues.schedules?.some(
+      (schedule) =>
+        schedule.date &&
+        schedule.times?.some((time) => time.startTime && time.endTime),
+    );
+  };
+
+  const validateImageStep = () => {
+    return Boolean(
+      formValues.bannerImageUrl && formValues.subImages?.length >= 1,
+    );
+  };
+
+  const isFormValid = () => {
+    return (
+      validateBasicStep() &&
+      validateLocationStep() &&
+      validateScheduleStep() &&
+      validateImageStep()
+    );
+  };
+
+  const handleSubmit = methods.handleSubmit(async (data) => {
+    if (!isFormValid()) {
+      return;
+    }
+    localStorage.removeItem('activityFormDraft');
+    console.log('Submit data:', data);
+  });
+
+  const handleTempSave = () => {
+    const formData = methods.getValues();
+    localStorage.setItem(
+      'activityFormDraft',
+      JSON.stringify({
+        data: formData,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+
+    alertModal({
+      icon: 'success',
+      text: '임시저장이 완료되었습니다.',
+      timer: 2000,
+      confirmButtonText: '확인',
+    });
+  };
+
   const getCurrentStepId = () => {
-    // asPath를 사용하여 실제 URL 경로를 가져옴
     const path = router.asPath;
-    // URL에서 마지막 부분 추출 (예: /activity/create/basic -> basic)
     const currentPath = path.split('/').pop();
-    // 현재 경로와 일치하는 step 찾기
     const currentStep = steps.find((step) =>
       step.path.includes(currentPath || ''),
     );
     return currentStep?.id || 'basic';
   };
 
-  // 각 단계의 완료 상태 확인
-  const checkStepCompletion = (stepId: string) => {
+  const getStepStatus = (stepId: string) => {
+    const currentStepId = getCurrentStepId();
+    const currentStepIndex = steps.findIndex(
+      (step) => step.id === currentStepId,
+    );
+    const stepIndex = steps.findIndex((step) => step.id === stepId);
+
+    let isCompleted = false;
     switch (stepId) {
       case 'basic':
-        // 기본 정보의 모든 필드가 채워져야 완료
-        return Boolean(
-          formValues.title?.trim() &&
-            formValues.category?.trim() &&
-            formValues.description?.trim(),
-        );
-
+        isCompleted = validateBasicStep();
+        break;
       case 'location':
-        // 주소 정보가 모두 채워져야 완료
-        return Boolean(formValues.address?.trim());
-
-      // case 'schedule':
-      //   // 일정 정보가 모두 채워져야 완료
-      //   return (
-      //     formValues.schedules?.every(
-      //       (schedule) =>
-      //         // 날짜가 있고
-      //         schedule.date &&
-      //         // 모든 시간대가 채워져 있는지 확인
-      //         schedule.times.every(
-      //           (time) => time.startTime.trim() && time.endTime.trim(),
-      //         ),
-      //     ) || false
-      //   );
-
+        isCompleted = validateLocationStep();
+        break;
+      case 'schedule':
+        isCompleted = validateScheduleStep();
+        break;
       case 'images':
-        // 필수 이미지가 모두 업로드되어야 완료
-        return Boolean(
-          formValues.bannerImageUrl && formValues.bannerImageUrl.length > 0,
-        );
-
-      default:
-        return false;
+        isCompleted = validateImageStep();
+        break;
     }
+
+    if (isCompleted) return 'completed';
+    if (stepIndex === currentStepIndex) return 'current';
+    if (stepIndex < currentStepIndex) return 'incomplete';
+    return 'upcoming';
   };
 
-  // 단계의 상태 결정
-  const getStepStatus = (stepId: string) => {
-    const currentStep = getCurrentStepId();
-    const isCompleted = checkStepCompletion(stepId);
-    const hasStarted = Boolean(
-      Object.keys(formValues).some(
-        (key) =>
-          formValues[key as keyof ExperienceFormData] &&
-          (typeof formValues[key as keyof ExperienceFormData] === 'string'
-            ? formValues[key as keyof ExperienceFormData] !== ''
-            : true),
-      ),
-    );
-
-    if (isCompleted) {
-      return 'completed';
-    }
-    if (currentStep === stepId && hasStarted) {
-      return 'in-progress';
-    }
-    return 'default';
-  };
-
-  // 상태에 따른 스타일 결정
   const getStepStyles = (status: string) => {
     const baseStyle =
-      'group flex items-center px-3 py-4 text-md font-medium rounded-md transition-all duration-200';
+      'group flex items-center px-3 py-4 text-md font-medium rounded-lg transition-all duration-200';
 
     switch (status) {
       case 'completed':
-        return `${baseStyle} bg-white shadow text-blue-DEFAULT`;
-      case 'in-progress':
-        return `${baseStyle} bg-white shadow text-yellow-DEFAULT`;
+        return `${baseStyle} bg-gray-50 text-blue-DEFAULT`;
+      case 'current':
+        return `${baseStyle} bg-gray-50 text-yellow-DEFAULT shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]`;
+      case 'incomplete':
+        return `${baseStyle} bg-gray-50 text-gray-400 hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]`;
       default:
-        return `${baseStyle} text-gray-700 hover:bg-white hover:shadow`;
-    }
-  };
-
-  // 상태에 따른 아이콘 결정
-  const getStepIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CircleCheckIcon className="w-5 h-5 text-blue-DEFAULT" />;
-      case 'in-progress':
-        return <CircleDotIcon className="w-5 h-5 text-yellow-DEFAULT" />;
-      default:
-        return <Circle className="w-5 h-5 text-gray-400" />;
-    }
-  };
-
-  // 상태에 따른 텍스트 결정
-  const getStepStatusText = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return (
-          <span className="ml-3 text-sm font-medium text-blue-DEFAULT">
-            완료
-          </span>
-        );
-      case 'in-progress':
-        return (
-          <span className="ml-3 text-sm font-medium text-yellow-DEFAULT">
-            작성중
-          </span>
-        );
-      default:
-        return null;
+        return `${baseStyle} bg-gray-50 text-gray-700 hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]`;
     }
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit}>
-        {/* form 태그 추가 및 onSubmit 이벤트 추가 */}
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-12 gap-8">
               <div className="col-span-3">
-                <nav className="sticky top-8 space-y-1">
+                <nav className="flex flex-col gap-2">
                   {steps.map((step) => {
                     const status = getStepStatus(step.id);
+                    const textColorClass =
+                      status === 'completed'
+                        ? 'text-blue-DEFAULT'
+                        : status === 'current'
+                          ? 'text-yellow-DEFAULT'
+                          : 'text-gray-400';
+
                     return (
                       <Link
                         key={step.id}
                         href={step.path}
                         className={getStepStyles(status)}
                       >
-                        <span className="mr-3">{getStepIcon(status)}</span>
+                        <span className="mr-3">
+                          <Image
+                            src={step.image}
+                            alt={step.title}
+                            width={20}
+                            height={20}
+                            className={textColorClass}
+                          />
+                        </span>
                         <span className="flex-1">{step.title}</span>
-                        {getStepStatusText(status)}
+                        {status === 'completed' && (
+                          <span className="ml-3">
+                            <Image
+                              src="/images/number/check.png"
+                              alt="완료"
+                              width={16}
+                              height={16}
+                              className="text-blue-DEFAULT"
+                            />
+                          </span>
+                        )}
+                        {status === 'current' && (
+                          <span className="ml-3">
+                            <Image
+                              src="/images/number/pin.png"
+                              alt="작성중"
+                              width={16}
+                              height={16}
+                              className="text-yellow-DEFAULT"
+                            />
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
                 </nav>
+
+                <div className="flex flex-col gap-1 mt-12">
+                  <button
+                    type="button"
+                    onClick={handleTempSave}
+                    className="h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors"
+                  >
+                    임시저장
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isFormValid()}
+                    className={`h-12 rounded-md text-gray-50 transition-colors ${
+                      isFormValid()
+                        ? 'bg-green-dark hover:bg-green-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    등록하기
+                  </button>
+                </div>
               </div>
 
               <div className="col-span-9">
@@ -183,8 +322,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           </div>
-          <button type="button">임시저장</button>
-          <button type="submit">등록하기</button>
         </div>
       </form>
     </FormProvider>
