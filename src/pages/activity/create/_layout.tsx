@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { ExperienceFormData } from '@/types/activity/activity';
 import Image from 'next/image';
+import { alertModal } from '@/utils/alert/alertModal';
 
 const steps = [
   {
@@ -45,6 +47,78 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const formValues = methods.watch();
+  const { reset } = methods;
+
+  useEffect(() => {
+    const checkDraftData = () => {
+      const draftData = localStorage.getItem('activityFormDraft');
+
+      if (draftData) {
+        try {
+          const { data } = JSON.parse(draftData);
+
+          // 현재 경로가 basic인지 확인
+          const currentPath = router.asPath;
+          const isBasicPath = currentPath.includes('/activity/create/basic');
+
+          if (isBasicPath) {
+            alertModal({
+              icon: 'info',
+              text: '기존에 작성 중인 글이 존재합니다. 이어서 작성하시겠습니까?',
+              showCancelButton: true,
+              confirmButtonText: '이어서 작성하기',
+              cancelButtonText: '임시저장 삭제하기',
+              confirmedFunction: () => {
+                reset(data);
+              },
+              confirmedDismiss: () => {
+                localStorage.removeItem('activityFormDraft');
+              },
+            });
+          }
+        } catch (error) {
+          console.error('Draft data parsing error:', error);
+          localStorage.removeItem('activityFormDraft');
+
+          alertModal({
+            icon: 'error',
+            text: '임시저장된 데이터를 불러오는데 실패했습니다.',
+            confirmButtonText: '확인',
+          });
+        }
+      }
+    };
+
+    // router가 준비되었을 때만 실행
+    if (router.isReady) {
+      checkDraftData();
+    }
+  }, [router.isReady, router.asPath, reset]);
+
+  // 24시간이 지난 임시저장 데이터 자동 삭제
+  useEffect(() => {
+    const cleanupDraftData = () => {
+      const draftData = localStorage.getItem('activityFormDraft');
+
+      if (draftData) {
+        try {
+          const { timestamp } = JSON.parse(draftData);
+          const savedTime = new Date(timestamp).getTime();
+          const currentTime = new Date().getTime();
+          const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
+
+          if (hoursDiff >= 24) {
+            localStorage.removeItem('activityFormDraft');
+          }
+        } catch (error) {
+          console.error('Draft cleanup error:', error);
+          localStorage.removeItem('activityFormDraft');
+        }
+      }
+    };
+
+    cleanupDraftData();
+  }, []);
 
   const validateBasicStep = () => {
     const { title, category, description } = formValues;
@@ -82,6 +156,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     if (!isFormValid()) {
       return;
     }
+    localStorage.removeItem('activityFormDraft');
     console.log('Submit data:', data);
   });
 
@@ -94,6 +169,13 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
         timestamp: new Date().toISOString(),
       }),
     );
+
+    alertModal({
+      icon: 'success',
+      text: '임시저장이 완료되었습니다.',
+      timer: 2000,
+      confirmButtonText: '확인',
+    });
   };
 
   const getCurrentStepId = () => {
@@ -223,7 +305,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                     disabled={!isFormValid()}
                     className={`h-12 rounded-md text-gray-50 transition-colors ${
                       isFormValid()
-                        ? 'bg-green-600 hover:bg-green-700'
+                        ? 'bg-green-dark hover:bg-green-700'
                         : 'bg-gray-400 cursor-not-allowed'
                     }`}
                   >
