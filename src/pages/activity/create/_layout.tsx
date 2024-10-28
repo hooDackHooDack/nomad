@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { ExperienceFormData } from '@/types/activity/activity';
@@ -48,12 +48,14 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const formValues = methods.watch();
   const { reset } = methods;
+  const [alertShown, setAlertShown] = useState(false);
 
   useEffect(() => {
     const checkDraftData = () => {
       const draftData = localStorage.getItem('activityFormDraft');
 
-      if (draftData) {
+      if (draftData && !alertShown) {
+        // alertShown 상태 확인
         try {
           const { data } = JSON.parse(draftData);
 
@@ -75,6 +77,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                 localStorage.removeItem('activityFormDraft');
               },
             });
+            setAlertShown(true); // 경고창을 한 번 표시한 후 상태를 업데이트
           }
         } catch (error) {
           console.error('Draft data parsing error:', error);
@@ -93,7 +96,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     if (router.isReady) {
       checkDraftData();
     }
-  }, [router.isReady, router.asPath, reset]);
+  }, [router.isReady, router.asPath, reset, alertShown]);
 
   // 24시간이 지난 임시저장 데이터 자동 삭제
   useEffect(() => {
