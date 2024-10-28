@@ -98,6 +98,59 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [router.isReady, router.asPath, reset, alertShown]);
 
+  useEffect(() => {
+
+    // 새로고침 방지를 위해 키를 누를 때 새로고침을 감지
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+        e.preventDefault(); // 새로고침을 차단
+        alertModal({
+          icon: 'warning',
+          text: '작성 중인 내용이 사라질 수 있습니다. 새로고침하시겠습니까?',
+          showCancelButton: true,
+          confirmButtonText: '새로고침',
+          cancelButtonText: '취소',
+          confirmedFunction: () => {
+            window.location.reload(); // 새로고침을 확인하면 실제로 새로고침 실행
+          },
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [formValues]);
+
+  useEffect(() => {
+
+    const handleRouteChange = (url: string) => {
+      // activity/create/* 경로 밖으로 나가는 경우에 경고창 표시
+      if (!url.startsWith('/activity/create')) {
+        alertModal({
+          icon: 'warning',
+          text: '작성 중인 내용이 사라질 수 있습니다. 페이지를 이동하시겠습니까?',
+          showCancelButton: true,
+          confirmButtonText: '이동하기',
+          cancelButtonText: '취소',
+          confirmedFunction: () => {
+            router.push(url); // 사용자가 이동을 확인하면 페이지 이동
+          },
+        });
+        throw 'Route change prevented'; // 페이지 이동을 일시 중지
+      }
+    };
+
+    // Next.js의 routeChangeStart 이벤트 사용하여 페이지 이동 감지
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
+    };
+  }, [formValues, router]);
+
   // 24시간이 지난 임시저장 데이터 자동 삭제
   useEffect(() => {
     const cleanupDraftData = () => {
