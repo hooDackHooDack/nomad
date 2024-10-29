@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { ExperienceFormData } from '@/types/activity/activity';
@@ -51,12 +51,68 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const [alertShown, setAlertShown] = useState(false);
   const [lastSavedValues, setLastSavedValues] =
     useState<ExperienceFormData | null>(null);
+  const refreshConfirmed = useRef(false);
 
   const hasFormChanged = () => {
     if (!lastSavedValues) return false;
-
     return JSON.stringify(formValues) !== JSON.stringify(lastSavedValues);
   };
+
+  useEffect(() => {
+    let reloadConfirmationShown = false;
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      const isRefreshKeyCombo =
+        (e.key === 'r' && (e.ctrlKey || e.metaKey)) || e.key === 'F5';
+
+      if (
+        isRefreshKeyCombo &&
+        hasFormChanged() &&
+        !refreshConfirmed.current &&
+        !reloadConfirmationShown
+      ) {
+        e.preventDefault();
+        reloadConfirmationShown = true;
+
+        try {
+          await new Promise((resolve) => {
+            alertModal({
+              icon: 'warning',
+              title: '작성 중인 내용이 사라질 수 있습니다.',
+              text: '페이지를 새로고침 하시겠습니까?',
+              showCancelButton: true,
+              confirmButtonText: '새로고침',
+              cancelButtonText: '취소',
+              confirmedFunction: () => {
+                refreshConfirmed.current = true;
+                resolve(true);
+              },
+            });
+          });
+
+          // 사용자가 확인을 누른 경우
+          window.location.reload();
+        } catch {
+          // 사용자가 취소를 누른 경우
+          reloadConfirmationShown = false;
+        }
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasFormChanged() && !refreshConfirmed.current) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [formValues, lastSavedValues]);
 
   useEffect(() => {
     const checkDraftData = () => {
@@ -196,15 +252,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  const handleSubmit = methods.handleSubmit(async (data) => {
-    if (!isFormValid()) {
-      return;
-    }
-    localStorage.removeItem('activityFormDraft');
-    setLastSavedValues(null);
-    console.log('Submit data:', data);
-  });
-
   const handleTempSave = () => {
     const formData = methods.getValues();
     localStorage.setItem(
@@ -223,6 +270,21 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       confirmButtonText: '확인',
     });
   };
+
+  const handleSubmit = methods.handleSubmit(async (data) => {
+    if (!isFormValid()) {
+      return;
+    }
+
+    try {
+      refreshConfirmed.current = true; // 제출 시 새로고침 경고 비활성화
+      localStorage.removeItem('activityFormDraft');
+      setLastSavedValues(null);
+      console.log('Submit data:', data);
+    } catch (error) {
+      console.error('Form submit error:', error);
+    }
+  });
 
   const getCurrentStepId = () => {
     const path = router.asPath;
