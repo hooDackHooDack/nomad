@@ -49,6 +49,14 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const formValues = methods.watch();
   const { reset } = methods;
   const [alertShown, setAlertShown] = useState(false);
+  const [lastSavedValues, setLastSavedValues] =
+    useState<ExperienceFormData | null>(null);
+
+  const hasFormChanged = () => {
+    if (!lastSavedValues) return false;
+
+    return JSON.stringify(formValues) !== JSON.stringify(lastSavedValues);
+  };
 
   useEffect(() => {
     const checkDraftData = () => {
@@ -72,9 +80,11 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
               cancelButtonText: '임시저장 삭제하기',
               confirmedFunction: () => {
                 reset(data);
+                setLastSavedValues(data);
               },
               confirmedDismiss: () => {
                 localStorage.removeItem('activityFormDraft');
+                setLastSavedValues(null);
               },
             });
             setAlertShown(true); // 경고창을 한 번 표시한 후 상태를 업데이트
@@ -82,6 +92,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
         } catch (error) {
           console.error('Draft data parsing error:', error);
           localStorage.removeItem('activityFormDraft');
+          setLastSavedValues(null);
 
           alertModal({
             icon: 'error',
@@ -99,43 +110,18 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   }, [router.isReady, router.asPath, reset, alertShown]);
 
   useEffect(() => {
-
-    // 새로고침 방지를 위해 키를 누를 때 새로고침을 감지
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-        e.preventDefault(); // 새로고침을 차단
-        alertModal({
-          icon: 'warning',
-          text: '작성 중인 내용이 사라질 수 있습니다. 새로고침하시겠습니까?',
-          showCancelButton: true,
-          confirmButtonText: '새로고침',
-          cancelButtonText: '취소',
-          confirmedFunction: () => {
-            window.location.reload(); // 새로고침을 확인하면 실제로 새로고침 실행
-          },
-        });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [formValues]);
-
-  useEffect(() => {
-
     const handleRouteChange = (url: string) => {
       // activity/create/* 경로 밖으로 나가는 경우에 경고창 표시
-      if (!url.startsWith('/activity/create')) {
+      if (hasFormChanged() && !url.startsWith('/activity/create')) {
         alertModal({
           icon: 'warning',
-          text: '작성 중인 내용이 사라질 수 있습니다. 페이지를 이동하시겠습니까?',
+          title: '작성 중인 내용이 사라질 수 있습니다.',
+          text: '페이지를 이동하시겠습니까?',
           showCancelButton: true,
           confirmButtonText: '이동하기',
           cancelButtonText: '취소',
           confirmedFunction: () => {
+            router.events.off('routeChangeStart', handleRouteChange);
             router.push(url); // 사용자가 이동을 확인하면 페이지 이동
           },
         });
@@ -149,7 +135,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
     };
-  }, [formValues, router]);
+  }, [router, formValues, lastSavedValues]);
 
   // 24시간이 지난 임시저장 데이터 자동 삭제
   useEffect(() => {
@@ -165,10 +151,12 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
           if (hoursDiff >= 24) {
             localStorage.removeItem('activityFormDraft');
+            setLastSavedValues(null);
           }
         } catch (error) {
           console.error('Draft cleanup error:', error);
           localStorage.removeItem('activityFormDraft');
+          setLastSavedValues(null);
         }
       }
     };
@@ -213,6 +201,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     localStorage.removeItem('activityFormDraft');
+    setLastSavedValues(null);
     console.log('Submit data:', data);
   });
 
@@ -225,6 +214,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
         timestamp: new Date().toISOString(),
       }),
     );
+    setLastSavedValues(formData);
 
     alertModal({
       icon: 'success',
