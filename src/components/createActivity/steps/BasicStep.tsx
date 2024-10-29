@@ -1,5 +1,4 @@
 import { useFormContext } from 'react-hook-form';
-import { useRouter } from 'next/router';
 import { ExperienceFormData } from '@/types/activity/activity';
 import FormInput from '@/components/form/input/FormInput';
 import RadioGroupInput from '@/components/form/input/radioGroup/RadioInput';
@@ -22,7 +21,6 @@ export default function BasicStep() {
     watch,
   } = useFormContext<ExperienceFormData>();
 
-  const router = useRouter();
   const description = watch('description');
 
   const handleEditorChange = (content: string) => {
@@ -58,15 +56,7 @@ export default function BasicStep() {
         />
       </div>
 
-      <div className="flex justify-end mt-6">
-        <button
-          type="button" // 버튼 타입 추가
-          onClick={() => router.push('/activity/create/images')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          다음
-        </button>
-      </div>
+      <div className="flex justify-end mt-6"></div>
     </div>
   );
 }

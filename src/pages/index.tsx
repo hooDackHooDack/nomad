@@ -30,7 +30,7 @@ const LandingPage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 2.5 }}
         >
-          <Link href={'/list'}>체험 둘러보기</Link>
+          <Link href={'/activities'}>체험 둘러보기</Link>
         </motion.button>
       </div>
     </div>

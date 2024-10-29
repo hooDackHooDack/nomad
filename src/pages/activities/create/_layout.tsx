@@ -10,25 +10,25 @@ const steps = [
   {
     id: 'basic',
     title: '기본 정보',
-    path: '/activity/create/basic',
+    path: '/activities/create/basic',
     image: '/images/number/one.png',
   },
   {
     id: 'location',
     title: '주소',
-    path: '/activity/create/location',
+    path: '/activities/create/location',
     image: '/images/number/two.png',
   },
   {
     id: 'schedule',
     title: '일정',
-    path: '/activity/create/schedule',
+    path: '/activities/create/schedule',
     image: '/images/number/three.png',
   },
   {
     id: 'images',
     title: '이미지',
-    path: '/activity/create/images',
+    path: '/activities/create/images',
     image: '/images/number/four.png',
   },
 ];
