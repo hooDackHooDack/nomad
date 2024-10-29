@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { ExperienceFormData } from '@/types/activity/activity';
@@ -49,6 +49,70 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const formValues = methods.watch();
   const { reset } = methods;
   const [alertShown, setAlertShown] = useState(false);
+  const [lastSavedValues, setLastSavedValues] =
+    useState<ExperienceFormData | null>(null);
+  const refreshConfirmed = useRef(false);
+
+  const hasFormChanged = () => {
+    if (!lastSavedValues) return false;
+    return JSON.stringify(formValues) !== JSON.stringify(lastSavedValues);
+  };
+
+  useEffect(() => {
+    let reloadConfirmationShown = false;
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      const isRefreshKeyCombo =
+        (e.key === 'r' && (e.ctrlKey || e.metaKey)) || e.key === 'F5';
+
+      if (
+        isRefreshKeyCombo &&
+        hasFormChanged() &&
+        !refreshConfirmed.current &&
+        !reloadConfirmationShown
+      ) {
+        e.preventDefault();
+        reloadConfirmationShown = true;
+
+        try {
+          await new Promise((resolve) => {
+            alertModal({
+              icon: 'warning',
+              title: '작성 중인 내용이 사라질 수 있습니다.',
+              text: '페이지를 새로고침 하시겠습니까?',
+              showCancelButton: true,
+              confirmButtonText: '새로고침',
+              cancelButtonText: '취소',
+              confirmedFunction: () => {
+                refreshConfirmed.current = true;
+                resolve(true);
+              },
+            });
+          });
+
+          // 사용자가 확인을 누른 경우
+          window.location.reload();
+        } catch {
+          // 사용자가 취소를 누른 경우
+          reloadConfirmationShown = false;
+        }
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasFormChanged() && !refreshConfirmed.current) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [formValues, lastSavedValues]);
 
   useEffect(() => {
     const checkDraftData = () => {
@@ -72,9 +136,11 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
               cancelButtonText: '임시저장 삭제하기',
               confirmedFunction: () => {
                 reset(data);
+                setLastSavedValues(data);
               },
               confirmedDismiss: () => {
                 localStorage.removeItem('activityFormDraft');
+                setLastSavedValues(null);
               },
             });
             setAlertShown(true); // 경고창을 한 번 표시한 후 상태를 업데이트
@@ -82,6 +148,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
         } catch (error) {
           console.error('Draft data parsing error:', error);
           localStorage.removeItem('activityFormDraft');
+          setLastSavedValues(null);
 
           alertModal({
             icon: 'error',
@@ -98,6 +165,34 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }, [router.isReady, router.asPath, reset, alertShown]);
 
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      // activity/create/* 경로 밖으로 나가는 경우에 경고창 표시
+      if (hasFormChanged() && !url.startsWith('/activity/create')) {
+        alertModal({
+          icon: 'warning',
+          title: '작성 중인 내용이 사라질 수 있습니다.',
+          text: '페이지를 이동하시겠습니까?',
+          showCancelButton: true,
+          confirmButtonText: '이동하기',
+          cancelButtonText: '취소',
+          confirmedFunction: () => {
+            router.events.off('routeChangeStart', handleRouteChange);
+            router.push(url); // 사용자가 이동을 확인하면 페이지 이동
+          },
+        });
+        throw 'Route change prevented'; // 페이지 이동을 일시 중지
+      }
+    };
+
+    // Next.js의 routeChangeStart 이벤트 사용하여 페이지 이동 감지
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
+    };
+  }, [router, formValues, lastSavedValues]);
+
   // 24시간이 지난 임시저장 데이터 자동 삭제
   useEffect(() => {
     const cleanupDraftData = () => {
@@ -112,10 +207,12 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
           if (hoursDiff >= 24) {
             localStorage.removeItem('activityFormDraft');
+            setLastSavedValues(null);
           }
         } catch (error) {
           console.error('Draft cleanup error:', error);
           localStorage.removeItem('activityFormDraft');
+          setLastSavedValues(null);
         }
       }
     };
@@ -155,14 +252,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  const handleSubmit = methods.handleSubmit(async (data) => {
-    if (!isFormValid()) {
-      return;
-    }
-    localStorage.removeItem('activityFormDraft');
-    console.log('Submit data:', data);
-  });
-
   const handleTempSave = () => {
     const formData = methods.getValues();
     localStorage.setItem(
@@ -172,6 +261,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
         timestamp: new Date().toISOString(),
       }),
     );
+    setLastSavedValues(formData);
 
     alertModal({
       icon: 'success',
@@ -180,6 +270,21 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       confirmButtonText: '확인',
     });
   };
+
+  const handleSubmit = methods.handleSubmit(async (data) => {
+    if (!isFormValid()) {
+      return;
+    }
+
+    try {
+      refreshConfirmed.current = true; // 제출 시 새로고침 경고 비활성화
+      localStorage.removeItem('activityFormDraft');
+      setLastSavedValues(null);
+      console.log('Submit data:', data);
+    } catch (error) {
+      console.error('Form submit error:', error);
+    }
+  });
 
   const getCurrentStepId = () => {
     const path = router.asPath;
