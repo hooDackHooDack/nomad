@@ -131,6 +131,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues, lastSavedValues]);
 
   useEffect(() => {
@@ -209,6 +210,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, formValues, lastSavedValues]);
 
   // 24시간이 지난 임시저장 데이터 자동 삭제
@@ -454,13 +456,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                     }`}
                   >
                     등록하기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => console.log(formValues)}
-                    className="h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md border-none transition-colors"
-                  >
-                    폼 값 확인
                   </button>
                 </div>
               </div>
