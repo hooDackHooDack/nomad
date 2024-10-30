@@ -48,7 +48,7 @@ export default function FormEditor({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-lg font-regular text-black mb-2">
         설명
       </label>
       <div className="h-96">
