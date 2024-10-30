@@ -1,11 +1,11 @@
 import { useFormContext } from 'react-hook-form';
-import { ExperienceFormData } from '@/types/activity/activity';
+import { ActivityFormInput } from '@/types/activity/activity';
 import FormInput from '@/components/form/input/FormInput';
 import RadioGroupInput from '@/components/form/input/radioGroup/RadioInput';
 import FormEditor from '@/components/form/editor/FormEditor';
 
 const categoryOptions = [
-  { value: '문화·예술', label: '문화·예술' },
+  { value: '문화 · 예술', label: '문화 · 예술' },
   { value: '식음료', label: '식음료' },
   { value: '스포츠', label: '스포츠' },
   { value: '투어', label: '투어' },
@@ -19,7 +19,7 @@ export default function BasicStep() {
     formState: { errors },
     setValue,
     watch,
-  } = useFormContext<ExperienceFormData>();
+  } = useFormContext<ActivityFormInput>();
 
   const description = watch('description');
 
@@ -31,7 +31,7 @@ export default function BasicStep() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">기본 정보</h1>
       <div className="space-y-4">
-        <FormInput<ExperienceFormData>
+        <FormInput<ActivityFormInput>
           label="제목"
           name="title"
           type="text"
@@ -40,7 +40,7 @@ export default function BasicStep() {
           placeholder="제목을 입력해주세요"
         />
 
-        <RadioGroupInput<ExperienceFormData>
+        <RadioGroupInput<ActivityFormInput>
           label="카테고리"
           name="category"
           register={register}
@@ -49,14 +49,22 @@ export default function BasicStep() {
           validationRule={{ required: '카테고리를 선택해주세요' }}
         />
 
+        <FormInput<ActivityFormInput>
+          label="가격"
+          name="price"
+          type="number"
+          register={register}
+          error={errors.price}
+          placeholder="0"
+          validationRule={{ required: '가격을 입력해주세요' }}
+        />
+
         <FormEditor
-          value={description || ''} // null/undefined 처리
+          value={description || ''}
           onChange={handleEditorChange}
           error={errors.description}
         />
       </div>
-
-      <div className="flex justify-end mt-6"></div>
     </div>
   );
 }

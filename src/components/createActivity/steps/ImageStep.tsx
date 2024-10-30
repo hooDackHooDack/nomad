@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useFormContext } from 'react-hook-form';
 import { PlusIcon, XIcon } from 'lucide-react';
-import { ExperienceFormData } from '@/types/activity/activity';
+import { ActivityFormInput } from '@/types/activity/activity';
 import authApi from '@/lib/axios/auth';
 import { alertModal } from '@/utils/alert/alertModal';
 
@@ -10,16 +10,14 @@ interface ImageUploadResponse {
 }
 
 const ImageUploadStep = () => {
-  const { setValue, watch, register } = useFormContext<ExperienceFormData>();
+  const { setValue, watch, register } = useFormContext<ActivityFormInput>();
 
   // register로 폼 필드 등록
   register('bannerImageUrl');
-  register('subImages');
+  register('subImageUrls');
 
-  // const bannerImageUrl = watch('bannerImageUrl');
-  const bannerPreview = watch('bannerPreview');
-  const subImages = watch('subImages') || [];
-  const subPreviews = watch('subPreviews') || [];
+  const bannerImageUrl = watch('bannerImageUrl');
+  const subImageUrls = watch('subImageUrls') || [];
 
   const uploadImage = async (file: File) => {
     try {
@@ -49,7 +47,7 @@ const ImageUploadStep = () => {
       try {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setValue('bannerPreview', reader.result as string, {
+          setValue('bannerImageUrl', reader.result as string, {
             shouldDirty: true,
           });
         };
@@ -57,8 +55,8 @@ const ImageUploadStep = () => {
 
         const imageUrl = await uploadImage(file);
         setValue('bannerImageUrl', imageUrl, { shouldDirty: true });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
+        console.error('Banner image upload error:', error);
         alertModal({
           text: '배너 이미지 업로드에 실패했습니다.',
           icon: 'error',
@@ -73,7 +71,7 @@ const ImageUploadStep = () => {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const files = Array.from(e.target.files || []);
-    const remainingSlots = 4 - subImages.length;
+    const remainingSlots = 4 - subImageUrls.length;
     const filesToUpload = files.slice(0, remainingSlots);
 
     try {
@@ -95,13 +93,14 @@ const ImageUploadStep = () => {
       const results = await Promise.all(uploadPromises);
 
       // 기존 이미지와 프리뷰 배열에 새로운 항목 추가
-      const newSubImages = [...subImages, ...results.map((r) => r.imageUrl)];
-      const newSubPreviews = [...subPreviews, ...results.map((r) => r.preview)];
+      const newSubImageUrls = [
+        ...subImageUrls,
+        ...results.map((r) => r.imageUrl),
+      ];
 
-      setValue('subImages', newSubImages, { shouldDirty: true });
-      setValue('subPreviews', newSubPreviews, { shouldDirty: true });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      setValue('subImageUrls', newSubImageUrls, { shouldDirty: true });
     } catch (error) {
+      console.error('Sub image upload error:', error);
       alertModal({
         text: '소개 이미지 업로드에 실패했습니다.',
         icon: 'error',
@@ -113,17 +112,12 @@ const ImageUploadStep = () => {
 
   const removeBannerImage = () => {
     setValue('bannerImageUrl', '', { shouldDirty: true });
-    setValue('bannerPreview', '', { shouldDirty: true });
   };
 
   const removeSubImage = (index: number) => {
-    const newSubImages = [...subImages];
-    newSubImages.splice(index, 1);
-    setValue('subImages', newSubImages, { shouldDirty: true });
-
-    const newPreviews = [...subPreviews];
-    newPreviews.splice(index, 1);
-    setValue('subPreviews', newPreviews, { shouldDirty: true });
+    const newSubImageUrls = [...subImageUrls];
+    newSubImageUrls.splice(index, 1);
+    setValue('subImageUrls', newSubImageUrls, { shouldDirty: true });
   };
 
   return (
@@ -135,7 +129,7 @@ const ImageUploadStep = () => {
         <p className="text-lg font-regular text-black">배너 이미지</p>
         <div className="relative">
           <label className="block">
-            {!bannerPreview ? (
+            {!bannerImageUrl ? (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-28 cursor-pointer hover:border-gray-400 transition-colors">
                 <div className="flex flex-col items-center">
                   <PlusIcon className="w-8 h-8 text-gray-400" />
@@ -147,7 +141,7 @@ const ImageUploadStep = () => {
             ) : (
               <div className="relative">
                 <img
-                  src={bannerPreview}
+                  src={bannerImageUrl}
                   alt="Banner preview"
                   className="w-full h-72 object-cover rounded-lg"
                 />
@@ -179,10 +173,10 @@ const ImageUploadStep = () => {
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <label key={index} className="block">
-              {subPreviews[index] ? (
+              {subImageUrls[index] ? (
                 <div className="relative">
                   <img
-                    src={subPreviews[index]}
+                    src={subImageUrls[index]}
                     alt={`Sub image ${index + 1}`}
                     className="w-full h-72 object-cover rounded-lg"
                   />
@@ -210,7 +204,7 @@ const ImageUploadStep = () => {
                 accept="image/*"
                 className="hidden"
                 onChange={handleSubImagesUpload}
-                disabled={subImages.length >= 4}
+                disabled={subImageUrls.length >= 4}
               />
             </label>
           ))}

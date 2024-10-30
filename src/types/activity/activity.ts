@@ -69,23 +69,3 @@ export interface ActivityItem {
   createdAt: string;
   updatedAt: string;
 }
-
-// 폼 상태 관리용 타입
-export interface ExperienceFormData {
-  title: string;
-  category: string;
-  description: string;
-  address: string;
-  price: number;
-  schedules: Array<{
-    date: string;
-    times: Array<{
-      startTime: string;
-      endTime: string;
-    }>;
-  }>;
-  bannerImageUrl: string | null;
-  subImages: string[];
-  bannerPreview: string;
-  subPreviews: string[];
-}

@@ -9,7 +9,7 @@ import {
 import OpenEye from '/public/icons/input/visibility_on.svg';
 import CloseEye from '/public/icons/input/visibility_off.svg';
 
-type InputType = 'text' | 'email' | 'password' | 'textarea';
+type InputType = 'text' | 'email' | 'password' | 'textarea' | 'number';
 
 type InputProps<TFormValues extends FieldValues> = {
   label: string;
@@ -20,7 +20,7 @@ type InputProps<TFormValues extends FieldValues> = {
   placeholder?: string;
   readOnly?: boolean;
   onClick?: () => void;
-  value?: string;
+  value?: string | number;
   validationRule?: RegisterOptions<TFormValues, Path<TFormValues>>;
 };
 
@@ -46,7 +46,10 @@ function FormInput<TFormValues extends FieldValues>({
 
   const renderInput = () => {
     const commonProps = {
-      ...register(name, validationRule),
+      ...register(name, {
+        ...validationRule,
+        setValueAs: type === 'number' ? (v) => (v === '' ? undefined : +v) : undefined, // 숫자 변환 설정
+      }),
       placeholder,
       className: `${inputClassName} ${type === 'textarea' ? 'h-32 py-2' : 'h-14'}`,
       id: name,

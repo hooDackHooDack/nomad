@@ -2,9 +2,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { ExperienceFormData } from '@/types/activity/activity';
+import { Activity, ActivityFormInput } from '@/types/activity/activity';
 import Image from 'next/image';
 import { alertModal } from '@/utils/alert/alertModal';
+import axios from 'axios';
+import authApi from '@/lib/axios/auth';
 
 const steps = [
   {
@@ -33,15 +35,32 @@ const steps = [
   },
 ];
 
+const createActivity = async (data: ActivityFormInput) => {
+  try {
+    const response = await authApi.post<Activity>(`/activities`, data);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ||
+          '액티비티 등록 중 오류가 발생했습니다.',
+      );
+    }
+    throw new Error('액티비티 등록 중 알 수 없는 오류가 발생했습니다.');
+  }
+};
+
 const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
-  const methods = useForm<ExperienceFormData>({
+  const methods = useForm<ActivityFormInput>({
     mode: 'onChange',
     defaultValues: {
       title: '',
       category: '',
       description: '',
       address: '',
-      schedules: [{ date: '', times: [{ startTime: '', endTime: '' }] }],
+      schedules: [{ date: '', startTime: '', endTime: '' }],
+      bannerImageUrl: '',
+      subImageUrls: [],
     },
   });
 
@@ -50,7 +69,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const { reset } = methods;
   const [alertShown, setAlertShown] = useState(false);
   const [lastSavedValues, setLastSavedValues] =
-    useState<ExperienceFormData | null>(null);
+    useState<ActivityFormInput | null>(null);
   const refreshConfirmed = useRef(false);
 
   const hasFormChanged = () => {
@@ -159,7 +178,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    // router가 준비되었을 때만 실행
     if (router.isReady) {
       checkDraftData();
     }
@@ -231,15 +249,13 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   const validateScheduleStep = () => {
     return formValues.schedules?.some(
-      (schedule) =>
-        schedule.date &&
-        schedule.times?.some((time) => time.startTime && time.endTime),
+      (schedule) => schedule.date && schedule.startTime && schedule.endTime,
     );
   };
 
   const validateImageStep = () => {
     return Boolean(
-      formValues.bannerImageUrl && formValues.subImages?.length >= 1,
+      formValues.bannerImageUrl && formValues.subImageUrls?.length >= 1,
     );
   };
 
@@ -277,12 +293,32 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      refreshConfirmed.current = true; // 제출 시 새로고침 경고 비활성화
+      refreshConfirmed.current = true;
+      console.log('Submit data:', data);
+      console.log(typeof data.price);
+      await createActivity(data);
+
       localStorage.removeItem('activityFormDraft');
       setLastSavedValues(null);
+
+      alertModal({
+        icon: 'success',
+        title: '액티비티가 성공적으로 등록되었습니다.',
+        text: '액티비티 목록 페이지로 이동합니다.',
+        confirmButtonText: '확인',
+        confirmedFunction: () => {
+          router.push('/activities');
+        },
+      });
       console.log('Submit data:', data);
     } catch (error) {
       console.error('Form submit error:', error);
+      alertModal({
+        icon: 'error',
+        title: '액티비티 등록 실패',
+        text: '액티비티 등록 중 오류가 발생했습니다.',
+        confirmButtonText: '확인',
+      });
     }
   });
 
@@ -404,7 +440,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                   <button
                     type="button"
                     onClick={handleTempSave}
-                    className="h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors"
+                    className="h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md border-none transition-colors"
                   >
                     임시저장
                   </button>
@@ -418,6 +454,13 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                     }`}
                   >
                     등록하기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => console.log(formValues)}
+                    className="h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md border-none transition-colors"
+                  >
+                    폼 값 확인
                   </button>
                 </div>
               </div>
