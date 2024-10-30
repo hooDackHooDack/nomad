@@ -2,7 +2,6 @@ import { useFormContext } from 'react-hook-form';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { ExperienceFormData } from '@/types/activity/activity';
 import authApi from '@/lib/axios/auth';
-import Link from 'next/link';
 import { alertModal } from '@/utils/alert/alertModal';
 
 interface ImageUploadResponse {
@@ -222,14 +221,7 @@ const ImageUploadStep = () => {
       </p>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6">
-        <Link
-          href="/activity/create/schedule"
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-        >
-          이전
-        </Link>
-      </div>
+      <div className="flex justify-between mt-6"></div>
     </div>
   );
 };

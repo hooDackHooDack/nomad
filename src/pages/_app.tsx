@@ -12,9 +12,7 @@ const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
-  const needsKakaoScript =
-    router.pathname.startsWith('/activity') ||
-    router.pathname.startsWith('/listItem');
+  const needsKakaoScript = router.pathname.startsWith('/activities');
 
   return (
     <QueryClientProvider client={queryClient}>
