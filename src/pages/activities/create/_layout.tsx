@@ -2,53 +2,12 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { Activity, ActivityFormInput } from '@/types/activity/activity';
+import { ActivityFormInput } from '@/types/activity/activity';
 import Image from 'next/image';
 import { alertModal } from '@/utils/alert/alertModal';
-import axios from 'axios';
-import authApi from '@/lib/axios/auth';
-
-const steps = [
-  {
-    id: 'basic',
-    title: '기본 정보',
-    path: '/activities/create/basic',
-    image: '/images/number/one.png',
-  },
-  {
-    id: 'location',
-    title: '주소',
-    path: '/activities/create/location',
-    image: '/images/number/two.png',
-  },
-  {
-    id: 'schedule',
-    title: '일정',
-    path: '/activities/create/schedule',
-    image: '/images/number/three.png',
-  },
-  {
-    id: 'images',
-    title: '이미지',
-    path: '/activities/create/images',
-    image: '/images/number/four.png',
-  },
-];
-
-const createActivity = async (data: ActivityFormInput) => {
-  try {
-    const response = await authApi.post<Activity>(`/activities`, data);
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(
-        error.response?.data?.message ||
-          '액티비티 등록 중 오류가 발생했습니다.',
-      );
-    }
-    throw new Error('액티비티 등록 중 알 수 없는 오류가 발생했습니다.');
-  }
-};
+import { steps } from '@/components/createActivity/layout/steps';
+import { createActivity } from '@/lib/api/activity';
+import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
 
 const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const methods = useForm<ActivityFormInput>({
@@ -67,6 +26,14 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const formValues = methods.watch();
   const { reset } = methods;
+  const {
+    validateBasicStep,
+    validateLocationStep,
+    validateScheduleStep,
+    validateImageStep,
+    isFormValid
+  } = useFormValidation(formValues);
+  
   const [alertShown, setAlertShown] = useState(false);
   const [lastSavedValues, setLastSavedValues] =
     useState<ActivityFormInput | null>(null);
@@ -131,7 +98,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues, lastSavedValues]);
 
   useEffect(() => {
@@ -145,7 +112,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
           // 현재 경로가 basic인지 확인
           const currentPath = router.asPath;
-          const isBasicPath = currentPath.includes('/activity/create/basic');
+          const isBasicPath = currentPath.includes('/activities/create/basic');
 
           if (isBasicPath) {
             alertModal({
@@ -187,7 +154,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       // activity/create/* 경로 밖으로 나가는 경우에 경고창 표시
-      if (hasFormChanged() && !url.startsWith('/activity/create')) {
+      if (hasFormChanged() && !url.startsWith('/activities/create')) {
         alertModal({
           icon: 'warning',
           title: '작성 중인 내용이 사라질 수 있습니다.',
@@ -210,7 +177,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, formValues, lastSavedValues]);
 
   // 24시간이 지난 임시저장 데이터 자동 삭제
@@ -239,36 +206,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
     cleanupDraftData();
   }, []);
-
-  const validateBasicStep = () => {
-    const { title, category, description } = formValues;
-    return Boolean(title?.trim() && category?.trim() && description?.trim());
-  };
-
-  const validateLocationStep = () => {
-    return Boolean(formValues.address?.trim());
-  };
-
-  const validateScheduleStep = () => {
-    return formValues.schedules?.some(
-      (schedule) => schedule.date && schedule.startTime && schedule.endTime,
-    );
-  };
-
-  const validateImageStep = () => {
-    return Boolean(
-      formValues.bannerImageUrl && formValues.subImageUrls?.length >= 1,
-    );
-  };
-
-  const isFormValid = () => {
-    return (
-      validateBasicStep() &&
-      validateLocationStep() &&
-      validateScheduleStep() &&
-      validateImageStep()
-    );
-  };
 
   const handleTempSave = () => {
     const formData = methods.getValues();
