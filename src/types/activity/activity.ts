@@ -35,8 +35,8 @@ export interface Activity {
 export interface ActivitySchedule {
   scheduleId: number;
   date: string;
-  time: string;
-  endTime?: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface ActivityTime {
