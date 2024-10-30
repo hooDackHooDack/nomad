@@ -6,6 +6,7 @@ import { Activity } from '@/types/activity/activity';
 import KakaoMap from '@/components/kakaoMap/KakaoMap';
 import LocationIcon from '/public/icons/button/Location.svg';
 import Image from 'next/image';
+import BookingDrawer from '@/components/footer/BookingDrawer';
 
 const fetchActivityDetail = async (activityId: string) => {
   const { data } = await basicApi.get<Activity>(`activities/${activityId}`);
@@ -143,6 +144,19 @@ const ActivityDetailPage = () => {
           </div>
         </div>
       </div>
+      {activity && (
+        <BookingDrawer
+          activity={activity}
+          schedules={activity.schedules.flatMap((schedule) =>
+            schedule.times.map((time) => ({
+              id: time.id,
+              date: schedule.date,
+              startTime: time.startTime,
+              endTime: time.endTime,
+            })),
+          )}
+        />
+      )}
     </div>
   );
 };
