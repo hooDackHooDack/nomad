@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useFormContext } from 'react-hook-form';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { ExperienceFormData } from '@/types/activity/activity';
@@ -126,12 +127,12 @@ const ImageUploadStep = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-lg font-bold">이미지</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">이미지</h2>
 
       {/* Banner Image Section */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">배너 이미지</p>
+        <p className="text-lg font-regular text-black">배너 이미지</p>
         <div className="relative">
           <label className="block">
             {!bannerPreview ? (
@@ -174,7 +175,7 @@ const ImageUploadStep = () => {
 
       {/* Sub Images Section */}
       <div className="space-y-2">
-        <p className="text-sm font-medium">소개 이미지</p>
+        <p className="text-lg font-regular text-black">소개 이미지</p>
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <label key={index} className="block">
@@ -219,9 +220,6 @@ const ImageUploadStep = () => {
       <p className="text-sm text-gray-500">
         *이미지는 최대 4개까지 등록 가능합니다.
       </p>
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6"></div>
     </div>
   );
 };
