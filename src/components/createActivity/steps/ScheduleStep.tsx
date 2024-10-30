@@ -14,7 +14,6 @@ const ScheduleStep = () => {
   const [tempDate, setTempDate] = useState('');
   const [tempStartTime, setTempStartTime] = useState('');
   const [tempEndTime, setTempEndTime] = useState('');
-
   const [isStartTimePickerOpen, setIsStartTimePickerOpen] = useState(false);
   const [isEndTimePickerOpen, setIsEndTimePickerOpen] = useState(false);
 
@@ -101,7 +100,6 @@ const ScheduleStep = () => {
             </div>
           </div>
 
-          {/* Add Button */}
           <div className="pt-[34px]">
             <button
               type="button"
@@ -114,14 +112,12 @@ const ScheduleStep = () => {
         </div>
       </div>
 
-      {/* Registered Schedules */}
       <div className="bg-gray-50 rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">등록된 일정</h3>
         {schedules.length > 0 ? (
           <div className="space-y-3">
             {schedules.map((schedule, index) => (
               <div key={index} className="flex items-center gap-3">
-                {/* Schedule Info */}
                 <div className="flex-1 bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
@@ -139,7 +135,6 @@ const ScheduleStep = () => {
                   </div>
                 </div>
 
-                {/* Delete Button */}
                 <button
                   type="button"
                   onClick={() => removeSchedule(index)}

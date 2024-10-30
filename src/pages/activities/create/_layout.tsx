@@ -17,7 +17,6 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
       category: '',
       description: '',
       address: '',
-      schedules: [{ date: '', startTime: '', endTime: '' }],
       bannerImageUrl: '',
       subImageUrls: [],
     },
