@@ -15,7 +15,7 @@ import { Activity } from '@/types/activity/activity';
 interface Schedule {
   scheduleId: number;
   date: string;
-  time: string;
+  startTime: string;
   endTime?: string;
 }
 
@@ -74,8 +74,8 @@ const BookingDrawer = ({ activity, schedules }: BookingDrawerProps) => {
         schedule.date === format(selectedDate || new Date(), 'yyyy-MM-dd'),
     )
     .map((schedule) => ({
-      startTime: schedule.time,
-      endTime: schedule.endTime || schedule.time,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
     }));
 
   const handleQuantityChange = (adjustment: number) => {
