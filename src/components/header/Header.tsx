@@ -19,10 +19,18 @@ const Header = () => {
         <Link href="/">
           <Logo />
         </Link>
-        <div className="flex gap">
+        <div className="">
           {user ? (
-            <div>
-              <p>{user.nickname}</p> <button onClick={logout}>로그아웃</button>
+            <div className="flex gap-2">
+              <Link href="/mypage">
+                <img
+                  src={user.profileImageUrl}
+                  alt="profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              </Link>
+              <p>{user.nickname}</p>
+              <button onClick={logout}>로그아웃</button>
             </div>
           ) : (
             <Link href="/auth/login">로그인</Link>

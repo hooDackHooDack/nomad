@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserInfo } from '@/types/user/userInfo';
 import basicApi from '@/lib/axios/basic';
-import authApi from '@/lib/axios/auth';
 import Cookies from 'js-cookie';
+import { getUser } from '@/lib/api/user';
 
 interface LoginResponse {
   user: UserInfo;
@@ -22,7 +22,7 @@ export function useAuth() {
       const accessToken = Cookies.get('accessToken');
       if (!accessToken) return null;
       try {
-        const { data } = await authApi.get<UserInfo>('/users/me');
+        const { data } = await getUser();
         return data;
       } catch (error) {
         console.error('로그인상태가 아닙니다.', error);
