@@ -145,17 +145,7 @@ const ActivityDetailPage = () => {
         </div>
       </div>
       {activity && (
-        <BookingDrawer
-          activity={activity}
-          schedules={activity.schedules.flatMap((schedule) =>
-            schedule.times.map((time) => ({
-              id: time.id,
-              date: schedule.date,
-              startTime: time.startTime,
-              endTime: time.endTime,
-            })),
-          )}
-        />
+        <BookingDrawer activity={activity} schedules={activity.schedules} />
       )}
     </div>
   );

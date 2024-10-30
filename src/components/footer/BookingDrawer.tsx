@@ -13,10 +13,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Activity } from '@/types/activity/activity';
 
 interface Schedule {
-  id: number;
+  scheduleId: number;
   date: string;
-  startTime: string;
-  endTime: string;
+  time: string;
+  endTime?: string;
 }
 
 interface BookingDrawerProps {
@@ -74,8 +74,8 @@ const BookingDrawer = ({ activity, schedules }: BookingDrawerProps) => {
         schedule.date === format(selectedDate || new Date(), 'yyyy-MM-dd'),
     )
     .map((schedule) => ({
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
+      startTime: schedule.time,
+      endTime: schedule.endTime || schedule.time,
     }));
 
   const handleQuantityChange = (adjustment: number) => {
