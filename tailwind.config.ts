@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss';
+import animate from 'tailwindcss-animate';
 
 const config: Config = {
+  darkMode: ['class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -8,9 +10,17 @@ const config: Config = {
   ],
   theme: {
     screens: {
-      sm: { min: '375px', max: '743px' },
-      md: { min: '744px', max: '1919px' },
-      lg: { min: '1920px' },
+      sm: {
+        min: '375px',
+        max: '743px',
+      },
+      md: {
+        min: '744px',
+        max: '1919px',
+      },
+      lg: {
+        min: '1920px',
+      },
     },
     colors: {
       black: {
@@ -18,16 +28,16 @@ const config: Config = {
         nomad: '#112211',
       },
       gray: {
-        50: '#FAFAFA',
-        100: '#EEEEEE',
-        200: '#DDDDDD',
-        300: '#CBCBCF',
-        400: '#ADAEAE',
-        500: '#A4A4A4',
-        600: '#9A9A9A',
-        700: '#79747E',
-        800: '#4B494B',
-        900: '#333333',
+        '50': '#FAFAFA',
+        '100': '#EEEEEE',
+        '200': '#DDDDDD',
+        '300': '#CBCBCF',
+        '400': '#ADAEAE',
+        '500': '#A4A4A4',
+        '600': '#9A9A9A',
+        '700': '#79747E',
+        '800': '#4B494B',
+        '900': '#333333',
       },
       green: {
         dark: '#0B3D2D',
@@ -73,8 +83,14 @@ const config: Config = {
     extend: {
       keyframes: {
         show: {
-          '0%, 49.99%': { opacity: '0', zIndex: '1' },
-          '50%, 100%': { opacity: '1', zIndex: '5' },
+          '0%, 49.99%': {
+            opacity: '0',
+            zIndex: '1',
+          },
+          '50%, 100%': {
+            opacity: '1',
+            zIndex: '5',
+          },
         },
       },
       animation: {
@@ -92,9 +108,15 @@ const config: Config = {
         '5': '5',
         '100': '100',
       },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+      colors: {},
     },
   },
-  plugins: [],
+  plugins: [animate],
 };
 
 export default config;
