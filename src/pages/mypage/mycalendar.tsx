@@ -1,5 +1,4 @@
-// pages/mypage/mycalendar.tsx
-import MyPageLayout from './_layout';
+import MyPageLayout from '@/components/mypage/MypageLayout';
 
 const MyCalendarPage = () => {
   return (

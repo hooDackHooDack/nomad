@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Camera } from 'lucide-react';
 import FormInput from '@/components/form/input/FormInput';
-import MyPageLayout from './_layout';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { alertModal } from '@/utils/alert/alertModal';
 import { updateUser, uploadImage } from '@/lib/api/user';
 import { ProfileFormData } from '@/types/user/userInfo';
+import MyPageLayout from '@/components/mypage/MypageLayout';
 
 const MyInfoPage = () => {
   const { user, isLoading } = useAuth();

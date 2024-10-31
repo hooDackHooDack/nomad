@@ -1,5 +1,4 @@
-// pages/mypage/myactivities.tsx
-import MyPageLayout from './_layout';
+import MyPageLayout from '@/components/mypage/MypageLayout';
 
 const MyActivitiesPage = () => {
   return (

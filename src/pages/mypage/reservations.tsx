@@ -1,5 +1,4 @@
-// pages/mypage/reservations.tsx
-import MyPageLayout from './_layout';
+import MyPageLayout from '@/components/mypage/MypageLayout';
 
 const ReservationsPage = () => {
   return (
