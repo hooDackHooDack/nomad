@@ -28,7 +28,7 @@ export function alertModal({
   text,
   icon,
   showCancelButton = false,
-  confirmButtonText,
+  confirmButtonText = '확인',
   cancelButtonText,
   timer,
   confirmedFunction,
