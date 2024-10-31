@@ -19,10 +19,8 @@ export const reservationsActivity = async ({
   activityId,
 }: ActivityReservation) => {
   return authApi.post(`/activities/${activityId}/reservations`, {
-    params: {
-      scheduleId,
-      headCount,
-    },
+    scheduleId,
+    headCount,
   });
 };
 
