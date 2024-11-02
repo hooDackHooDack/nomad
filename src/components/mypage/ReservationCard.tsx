@@ -11,31 +11,15 @@ const STATUS_STYLES = {
   completed: 'text-green-bright',
 };
 
-const ActionButton = ({ status }: { status: Reservation['status'] }) => {
-  if (status === 'pending') {
-    return (
-      <button className="border border-green-dark px-4 py-1 rounded-lg">
-        예약 취소
-      </button>
-    );
-  }
-
-  if (status === 'completed') {
-    return (
-      <button className="border border-green-dark px-4 py-1 rounded-lg">
-        후기 작성
-      </button>
-    );
-  }
-
-  return null;
-};
-
 export default function ReservationCard({
   reservation,
+  onCancel,
 }: {
   reservation: Reservation;
+  onCancel?: (reservationId: number) => void;
 }) {
+  const isCancelable = reservation.status === 'pending';
+
   return (
     <div className="flex bg-white rounded-lg shadow-md">
       <div className="size-36 flex-shrink-0">
@@ -63,7 +47,14 @@ export default function ReservationCard({
           <p className="font-bold mt-2">
             ₩ {reservation.totalPrice.toLocaleString()}
           </p>
-          <ActionButton status={reservation.status} />
+          {isCancelable && (
+            <button
+              onClick={() => onCancel && onCancel(reservation.id)}
+              className="border border-green-dark px-4 py-1 rounded-lg"
+            >
+              예약 취소
+            </button>
+          )}{' '}
         </div>
       </div>
     </div>

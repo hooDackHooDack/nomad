@@ -1,10 +1,11 @@
 import MyPageLayout from '@/components/mypage/MypageLayout';
 import { useState } from 'react';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import authApi from '@/lib/axios/auth';
 import { ReservationsResponse } from '@/types/mypage/reservations';
 import ReservationCard from '@/components/mypage/ReservationCard';
 import StatusDropdown from '@/components/mypage/ReservationDropdown';
+import { alertModal } from '@/utils/alert/alertModal';
 
 export const RESERVATION_STATUS = {
   pending: '예약 신청',
@@ -12,12 +13,9 @@ export const RESERVATION_STATUS = {
   completed: '체험 완료',
   canceled: '예약 취소',
   declined: '예약 거절',
-}
+};
 
-const fetchReservations = async (
-  size: number,
-  status?: string,
-) => {
+const fetchReservations = async (size: number, status?: string) => {
   const params: Record<string, any> = {
     size,
   };
@@ -32,9 +30,15 @@ const fetchReservations = async (
   return data;
 };
 
+const cancelReservation = async (reservationId: number) => {
+  await authApi.patch(`/my-reservations/${reservationId}`, {
+    status: 'canceled',
+  });
+};
+
 const ReservationsPage = () => {
   const [status, setStatus] = useState('');
-
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery<
     ReservationsResponse,
@@ -44,6 +48,29 @@ const ReservationsPage = () => {
     queryFn: () => fetchReservations(100, status),
     placeholderData: keepPreviousData,
   });
+
+  const cancelMutation = useMutation({
+    mutationFn: (reservationId: number) => cancelReservation(reservationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservations', status] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to cancel reservation:', error);
+      alert('Failed to cancel reservation. Please try again.');
+    },
+  });
+
+  const handleCancel = (reservationId: number) => {
+    alertModal({
+      title: '예약 취소',
+      text: '정말로 예약을 취소하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+      confirmedFunction: () => cancelMutation.mutate(reservationId),
+    });
+  }
 
   if (isLoading) {
     return <div className="text-center py-10">Loading...</div>;
@@ -60,17 +87,17 @@ const ReservationsPage = () => {
   return (
     <MyPageLayout>
       <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">예약 내역</h1>
           <StatusDropdown value={status} onChange={setStatus} />
         </div>
 
         <div className="space-y-4">
           {data?.reservations.map((reservation) => (
-            <ReservationCard key={reservation.id} reservation={reservation} />
+            <ReservationCard key={reservation.id} reservation={reservation} onCancel={handleCancel} />
           ))}
         </div>
-        </div>
+      </div>
     </MyPageLayout>
   );
 };
