@@ -1,7 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
+import { useState } from 'react';
 import { Reservation } from '@/types/mypage/reservations';
 import { cn } from '../ui/cn';
 import { RESERVATION_STATUS } from '@/pages/mypage/reservations';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Star } from 'lucide-react';
+import { postReview } from '@/lib/api/reservation';
 
 const STATUS_STYLES = {
   pending: 'text',
@@ -18,7 +28,18 @@ export default function ReservationCard({
   reservation: Reservation;
   onCancel?: (reservationId: number) => void;
 }) {
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
+
   const isCancelable = reservation.status === 'pending';
+  const isCompleted = reservation.status === 'completed';
+
+  const handleSubmitReview = () => {
+    console.log('Submitted Review:', { rating, review });
+    postReview(reservation.id, { rating, content: review });
+    setRating(0);
+    setReview('');
+  };
 
   return (
     <div className="flex bg-white rounded-lg shadow-md">
@@ -54,7 +75,71 @@ export default function ReservationCard({
             >
               예약 취소
             </button>
-          )}{' '}
+          )}
+          {isCompleted && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="bg-green-dark border border-green-dark text-white px-4 py-1 rounded-lg">
+                  후기 작성
+                </button>
+              </DialogTrigger>
+              <DialogContent className="rounded-md">
+                <DialogHeader>
+                  <DialogTitle>후기 작성</DialogTitle>
+                </DialogHeader>
+                <div className="flex items-center mt-4">
+                  <div className="size-36 flex-shrink-0 mr-4">
+                    <img
+                      src={reservation.activity.bannerImageUrl}
+                      alt="Activity Image"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold">
+                      {reservation.activity.title}
+                    </h2>
+                    <p className="text-sm mt-1">
+                      {reservation.date} · {reservation.startTime} -{' '}
+                      {reservation.endTime} · {reservation.headCount}명
+                    </p>
+                    <p className="text-xl font-bold mt-2">
+                      ₩ {reservation.totalPrice.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex mx-auto mt-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className={`size-12 cursor-pointer ${
+                        rating >= star ? 'text-yellow' : 'text-gray-300'
+                      }`}
+                      fill={rating >= star ? '#facc15' : 'none'}
+                    />
+                  ))}
+                </div>
+
+                <textarea
+                  value={review}
+                  onChange={(e) => setReview(e.target.value)}
+                  placeholder="후기를 작성해주세요"
+                  className="w-full h-40 border rounded mt-4 p-2 resize-none"
+                />
+
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={handleSubmitReview}
+                    className="bg-green-dark text-white px-6 py-2 rounded-lg"
+                  >
+                    작성하기
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
     </div>
