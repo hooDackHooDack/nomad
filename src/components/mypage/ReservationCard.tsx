@@ -4,17 +4,17 @@ import { cn } from '../ui/cn';
 import { RESERVATION_STATUS } from '@/pages/mypage/reservations';
 
 const STATUS_STYLES = {
-  pending: 'text-gray-600',
-  confirmed: 'text-blue-600',
-  declined: 'text-yellow-600',
-  canceled: 'text-red-600',
-  completed: 'text-green-600',
+  pending: 'text',
+  confirmed: 'text-blue',
+  declined: 'text-red',
+  canceled: 'text-gray-400',
+  completed: 'text-green-bright',
 };
 
 const ActionButton = ({ status }: { status: Reservation['status'] }) => {
-  if (status === 'confirmed') {
+  if (status === 'pending') {
     return (
-      <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+      <button className="border border-green-dark px-4 py-1 rounded-lg">
         예약 취소
       </button>
     );
@@ -22,7 +22,7 @@ const ActionButton = ({ status }: { status: Reservation['status'] }) => {
 
   if (status === 'completed') {
     return (
-      <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+      <button className="border border-green-dark px-4 py-1 rounded-lg">
         후기 작성
       </button>
     );
@@ -59,12 +59,12 @@ export default function ReservationCard({
           {reservation.date} · {reservation.startTime} - {reservation.endTime} ·{' '}
           {reservation.headCount}명
         </p>
-        <p className="font-bold mt-2">
-          ₩ {reservation.totalPrice.toLocaleString()}
-        </p>
-      </div>
-      <div className="flex items-center pr-4">
-        <ActionButton status={reservation.status} />
+        <div className="flex justify-between items-center">
+          <p className="font-bold mt-2">
+            ₩ {reservation.totalPrice.toLocaleString()}
+          </p>
+          <ActionButton status={reservation.status} />
+        </div>
       </div>
     </div>
   );

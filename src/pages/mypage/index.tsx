@@ -105,7 +105,7 @@ const MyInfoPage = () => {
           <h1 className="text-3xl font-bold">내 정보</h1>
           <button
             type="submit"
-            className="bg-green-dark text-white px-6 py-3 rounded-lg hover:bg-green-darker transition-colors"
+            className="bg-green-dark text-white px-8 py-2 rounded-lg hover:bg-green-darker transition-colors"
             onClick={handleSubmit(onSubmit)}
             disabled={isUpdateLoading}
           >
