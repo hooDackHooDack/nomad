@@ -5,12 +5,12 @@ import { Camera } from 'lucide-react';
 import FormInput from '@/components/form/input/FormInput';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { alertModal } from '@/utils/alert/alertModal';
-import { updateUser, uploadImage } from '@/lib/api/user';
+import { uploadImage } from '@/lib/api/user';
 import { ProfileFormData } from '@/types/user/userInfo';
 import MyPageLayout from '@/components/mypage/MypageLayout';
 
 const MyInfoPage = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, updateUser, isUpdateLoading } = useAuth();
   const [profileImage, setProfileImage] = useState('');
 
   useEffect(() => {
@@ -107,6 +107,7 @@ const MyInfoPage = () => {
             type="submit"
             className="bg-green-dark text-white px-6 py-3 rounded-lg hover:bg-green-darker transition-colors"
             onClick={handleSubmit(onSubmit)}
+            disabled={isUpdateLoading}
           >
             저장하기
           </button>
