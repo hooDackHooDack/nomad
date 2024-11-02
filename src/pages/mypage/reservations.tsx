@@ -1,11 +1,11 @@
 import MyPageLayout from '@/components/mypage/MypageLayout';
 import { useState } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import authApi from '@/lib/axios/auth';
 import { ReservationsResponse } from '@/types/mypage/reservations';
 import ReservationCard from '@/components/mypage/ReservationCard';
 import StatusDropdown from '@/components/mypage/ReservationDropdown';
 import { alertModal } from '@/utils/alert/alertModal';
+import { cancelReservation, fetchReservations } from '@/lib/api/reservation';
 
 export const RESERVATION_STATUS = {
   pending: '예약 신청',
@@ -15,26 +15,6 @@ export const RESERVATION_STATUS = {
   declined: '예약 거절',
 };
 
-const fetchReservations = async (size: number, status?: string) => {
-  const params: Record<string, any> = {
-    size,
-  };
-
-  if (status) {
-    params.status = status;
-  }
-
-  const { data } = await authApi.get<ReservationsResponse>('/my-reservations', {
-    params,
-  });
-  return data;
-};
-
-const cancelReservation = async (reservationId: number) => {
-  await authApi.patch(`/my-reservations/${reservationId}`, {
-    status: 'canceled',
-  });
-};
 
 const ReservationsPage = () => {
   const [status, setStatus] = useState('');
