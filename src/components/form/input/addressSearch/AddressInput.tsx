@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 import FormInput from '@/components/form/input/FormInput';
-import { ExperienceFormData } from '@/types/activity/activity';
+import { ActivityFormInput } from '@/types/activity/activity';
 
 declare global {
   interface Window {
@@ -18,7 +18,7 @@ const AddressSearch = ({ onAddressChange }: AddressSearchProps) => {
     setValue,
     formState: { errors },
     watch,
-  } = useFormContext<ExperienceFormData>();
+  } = useFormContext<ActivityFormInput>();
 
   const address = watch('address');
 
@@ -42,7 +42,7 @@ const AddressSearch = ({ onAddressChange }: AddressSearchProps) => {
   return (
     <div>
       <div className="w-full mt-4">
-        <FormInput<ExperienceFormData>
+        <FormInput<ActivityFormInput>
           label="주소"
           name="address"
           type="text"
