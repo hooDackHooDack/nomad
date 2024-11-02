@@ -27,8 +27,8 @@ const MyInfoPage = () => {
     setValue,
   } = useForm<ProfileFormData>({
     defaultValues: {
-      nickname: user?.nickname || '',
-      email: user?.email || '',
+      nickname: user?.nickname,
+      email: user?.email,
       profileImageUrl: user?.profileImageUrl || '',
       newPassword: '',
       confirmPassword: '',
@@ -150,7 +150,7 @@ const MyInfoPage = () => {
               type="text"
               register={register}
               error={errors.nickname}
-              value={user?.nickname || ''}
+              defaultValue={user?.nickname || ''}
               validationRule={{
                 required: '닉네임을 입력해주세요',
                 maxLength: {
@@ -166,7 +166,7 @@ const MyInfoPage = () => {
               register={register}
               error={errors.email}
               readOnly
-              value={user?.email || ''}
+              defaultValue={user?.email || ''}
             />
             <FormInput<ProfileFormData>
               label="새 비밀번호"
