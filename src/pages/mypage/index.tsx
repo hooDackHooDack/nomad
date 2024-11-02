@@ -149,7 +149,7 @@ const MyInfoPage = () => {
               type="text"
               register={register}
               error={errors.nickname}
-              placeholder={user?.nickname || ''}
+              value={user?.nickname || ''}
               validationRule={{
                 required: '닉네임을 입력해주세요',
                 maxLength: {
@@ -165,7 +165,7 @@ const MyInfoPage = () => {
               register={register}
               error={errors.email}
               readOnly
-              placeholder={user?.email || ''}
+              value={user?.email || ''}
             />
             <FormInput<ProfileFormData>
               label="새 비밀번호"
