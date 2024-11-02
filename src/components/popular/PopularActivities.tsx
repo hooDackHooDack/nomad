@@ -2,6 +2,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const PopularActivities = ({ activities }) => {
   const settings = {
@@ -67,9 +68,11 @@ const PopularActivities = ({ activities }) => {
               <div className="relative w-full min-[701px]:w-[350px] min-[1102px]:w-[400px] h-[500px] cursor-pointer bg-gray-100 rounded-lg flex flex-col justify-around group">
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg z-10">
-                  <div className="text-white text-xl font-semibold px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors duration-300">
-                    체험 자세히 보기
-                  </div>
+                  <Link href={`/activities/${activity.id}`}>
+                    <div className="text-white text-xl font-semibold px-6 py-3 border-2 border-white rounded-full hover:bg-white hover:text-black transition-colors duration-300">
+                      체험 자세히 보기
+                    </div>
+                  </Link>
                 </div>
 
                 <div className="overflow-hidden flex justify-center">
