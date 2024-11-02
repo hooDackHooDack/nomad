@@ -1,5 +1,6 @@
 import { Activity } from '@/types/activity/activity';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ActivityCard = ({ activity }: { activity: Activity }) => (
   <Link
@@ -7,11 +8,14 @@ const ActivityCard = ({ activity }: { activity: Activity }) => (
     className="block w-full transition-transform duration-200 hover:scale-105"
   >
     <div className="w-full cursor-pointer">
-      <img
+      <Image
         src={activity.bannerImageUrl}
         alt={activity.title}
         className="w-full h-48 object-cover rounded-xl mb-4"
+        width={200}
+        height={200}
       />
+
       <p className="text-lg mb-3">
         ⭐ {activity.rating}
         <span className="text-gray-500 ml-1">({activity.reviewCount})</span>

@@ -3,8 +3,8 @@ import basicApi from '@/lib/axios/basic';
 import { ActivitiesResponse } from '@/types/activity/activity';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import PopularActivities from '@/components/popular/PopularActivities';
 import Pagination from 'react-js-pagination';
-import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -53,11 +53,7 @@ export default function Home() {
   const [keyword, setKeyword] = useState('');
   const pageSize = 6;
 
-  const {
-    data: popularActivities,
-    isFetching: isFetchingPopular,
-    isError: isErrorPopular,
-  } = useQuery<ActivitiesResponse, Error>({
+  const { data: popularActivities } = useQuery<ActivitiesResponse, Error>({
     queryKey: ['popularActivities'],
     queryFn: () => fetchActivities(1, 10, undefined, 'most_reviewed'),
   });
@@ -103,14 +99,6 @@ export default function Home() {
     '웰빙',
   ];
 
-  const sliderSettings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-  };
-
   if (isPending || isFetching)
     return <div className="text-center py-10">Loading...</div>;
   if (isError)
@@ -121,83 +109,70 @@ export default function Home() {
     );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">인기 체험</h1>
+    <div>
+      <PopularActivities activities={popularActivities?.activities} />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold my-6">모든 체험</h1>
+        <div className="mb-6">
+          <div className="mb-2">Category</div>
+          <div className="flex gap-2">
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => handleCategoryChange(c)}
+                className={`px-3 py-1 rounded-md ${category === c ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      {isFetchingPopular ? (
-        <div className="text-center py-4">Loading...</div>
-      ) : isErrorPopular ? (
-        <div className="text-center py-4 text-red-500">Error</div>
-      ) : (
-        <Slider {...sliderSettings}>
-          {popularActivities?.activities.map((activity) => (
-            <div key={activity.id} className="w-1/3 px-2">
+        <div>
+          <select
+            value={sort}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="px-3 py-1 rounded-md mb-2"
+          >
+            <option value="">가격</option>
+            <option value="price_asc">가격 낮은 순</option>
+            <option value="price_desc">가격 높은 순</option>
+          </select>
+        </div>
+
+        <div className="mb-6">
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => handleKeywordChange(e.target.value)}
+            className="px-3 py-2 border rounded-md mr-2"
+            placeholder="검색어를 입력하세요"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {data?.activities.map((activity) => (
+            <div key={activity.id} className="w-full">
               <ActivityCard activity={activity} />
             </div>
           ))}
-        </Slider>
-      )}
-
-      <h1 className="text-3xl font-bold my-6">모든 체험</h1>
-      <div className="mb-6">
-        <div className="mb-2">Category</div>
-        <div className="flex gap-2">
-          {categories.map((c) => (
-            <button
-              key={c}
-              onClick={() => handleCategoryChange(c)}
-              className={`px-3 py-1 rounded-md ${category === c ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}
-            >
-              {c}
-            </button>
-          ))}
         </div>
-      </div>
 
-      <div>
-        <select
-          value={sort}
-          onChange={(e) => handleSortChange(e.target.value)}
-          className="px-3 py-1 rounded-md mb-2"
-        >
-          <option value="">가격</option>
-          <option value="price_asc">가격 낮은 순</option>
-          <option value="price_desc">가격 높은 순</option>
-        </select>
-      </div>
-
-      <div className="mb-6">
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => handleKeywordChange(e.target.value)}
-          className="px-3 py-2 border rounded-md mr-2"
-          placeholder="검색어를 입력하세요"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {data?.activities.map((activity) => (
-          <div key={activity.id} className="w-full">
-            <ActivityCard activity={activity} />
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-center mt-4">
-        {data && (
-          <Pagination
-            activePage={page}
-            itemsCountPerPage={pageSize}
-            totalItemsCount={data.totalCount || 0}
-            pageRangeDisplayed={5}
-            onChange={handlePageChange}
-            innerClass="flex items-center space-x-2"
-            itemClass="px-3 py-1 rounded-md mx-1 cursor-pointer hover:bg-blue-100"
-            activeClass="bg-blue-500 text-white hover:bg-blue-600"
-            disabledClass="text-gray-400 cursor-not-allowed"
-          />
-        )}
+        <div className="flex justify-center mt-4">
+          {data && (
+            <Pagination
+              activePage={page}
+              itemsCountPerPage={pageSize}
+              totalItemsCount={data.totalCount || 0}
+              pageRangeDisplayed={5}
+              onChange={handlePageChange}
+              innerClass="flex items-center space-x-2"
+              itemClass="px-3 py-1 rounded-md mx-1 cursor-pointer hover:bg-blue-100"
+              activeClass="bg-blue-500 text-white hover:bg-blue-600"
+              disabledClass="text-gray-400 cursor-not-allowed"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
