@@ -6,9 +6,11 @@ import { Activity } from '@/types/activity/activity';
 import KakaoMap from '@/components/kakaoMap/KakaoMap';
 import LocationIcon from '/public/icons/button/Location.svg';
 import Image from 'next/image';
+import ActivityReservation from '@/components/booking/ActivityReservation';
 
 const fetchActivityDetail = async (activityId: string) => {
   const { data } = await basicApi.get<Activity>(`activities/${activityId}`);
+  console.log(data.id);
   return data;
 };
 
@@ -100,12 +102,9 @@ const ActivityDetailPage = () => {
             )}
           </div>
         </div>
-        {/* 컨텐츠 영역 */}
-        <div className="grid grid-cols-12 gap-8">
-          {/* 왼쪽: 상세 정보 */}
+        <div>
           <div className="col-span-12 lg:col-span-8">
             <div className="bg-white rounded-xl p-2">
-              {/* 제목 및 기본 정보 */}
               <h1 className="text-3xl font-bold mb-4">{activity.title}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <span className="flex items-center">
@@ -143,6 +142,11 @@ const ActivityDetailPage = () => {
           </div>
         </div>
       </div>
+      <ActivityReservation
+        activityId={activity.id}
+        price={activity.price}
+        title={activity.title}
+      />
     </div>
   );
 };

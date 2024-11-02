@@ -69,3 +69,31 @@ export interface ActivityItem {
   createdAt: string;
   updatedAt: string;
 }
+
+// 체험예약신청 요청 body타입
+export interface ActivityReservation {
+  activityId: Activity['id'];
+  scheduleId: number;
+  headCount: number;
+}
+
+// 체험예약 가능일 조회 요청 타입
+export interface CheckSchedule {
+  activityId: Activity['id'];
+  year: number;
+  month: number;
+}
+
+// 체험예약 가능일 조회 응답 타입
+interface TimeSlot {
+  id: number;
+  startTime: string;
+  endTime: string;
+}
+
+interface ScheduleDate {
+  date: string;
+  times: TimeSlot[];
+}
+
+export type CheckScheduleRes = ScheduleDate[];
