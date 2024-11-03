@@ -78,7 +78,7 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className="col-span-9">
-            <div className="bg-white rounded-lg shadow p-6">{children}</div>
+            <div className="p-6">{children}</div>
           </div>
         </div>
       </div>

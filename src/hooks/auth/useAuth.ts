@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserInfo } from '@/types/user/userInfo';
+import { UserInfo, UserUpdateData } from '@/types/user/userInfo';
 import basicApi from '@/lib/axios/basic';
 import Cookies from 'js-cookie';
-import { getUser } from '@/lib/api/user';
+import { getUser, updateUser } from '@/lib/api/user';
 
 interface LoginResponse {
   user: UserInfo;
@@ -52,6 +52,16 @@ export function useAuth() {
     onError: () => console.log('로그인실패'),
   });
 
+  const updateUserMutation = useMutation({
+    mutationFn: async (updateData: UserUpdateData) => {
+      const { data } = await updateUser(updateData);
+      return data;
+    },
+    onSuccess: (data: UserUpdateData) => {
+      queryClient.setQueryData(['user'], data);
+    },
+  });
+
   return {
     user,
     isLoading,
@@ -59,6 +69,9 @@ export function useAuth() {
     login: loginMutation.mutate,
     isLoginLoading: loginMutation.isPending,
     loginError: loginMutation.error,
+    updateUser: updateUserMutation.mutate,
+    isUpdateLoading: updateUserMutation.isPending,
+    updateError: updateUserMutation.error,
   };
 }
 export function logout() {

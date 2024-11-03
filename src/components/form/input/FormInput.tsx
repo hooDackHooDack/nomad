@@ -22,6 +22,7 @@ type InputProps<TFormValues extends FieldValues> = {
   onClick?: () => void;
   value?: string | number;
   validationRule?: RegisterOptions<TFormValues, Path<TFormValues>>;
+  defaultValue?: string | number;
 };
 
 function FormInput<TFormValues extends FieldValues>({
@@ -35,6 +36,7 @@ function FormInput<TFormValues extends FieldValues>({
   readOnly,
   onClick,
   value,
+  defaultValue,
 }: InputProps<TFormValues>) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -56,6 +58,7 @@ function FormInput<TFormValues extends FieldValues>({
       readOnly,
       onClick,
       value,
+      defaultValue,
     };
 
     if (type === 'textarea') {
