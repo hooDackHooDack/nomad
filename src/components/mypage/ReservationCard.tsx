@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Reservation } from '@/types/mypage/reservations';
 import { cn } from '../ui/cn';
 import { RESERVATION_STATUS } from '@/pages/mypage/reservations';
@@ -20,6 +20,11 @@ const STATUS_STYLES = {
   completed: 'text-green-bright',
 };
 
+type ReviewFormValues = {
+  rating: number;
+  review: string;
+};
+
 export default function ReservationCard({
   reservation,
   onCancel,
@@ -27,19 +32,33 @@ export default function ReservationCard({
 }: {
   reservation: Reservation;
   onCancel?: (reservationId: number) => void;
-  onSubmitReview?: (reservationId: number, rating: number, content: string) => void;
+  onSubmitReview?: (
+    reservationId: number,
+    rating: number,
+    content: string,
+  ) => void;
 }) {
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState('');
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+  } = useForm<ReviewFormValues>({
+    defaultValues: {
+      rating: 0,
+      review: '',
+    },
+  });
 
+  const rating = watch('rating');
   const isCancelable = reservation.status === 'pending';
   const isCompleted = reservation.status === 'completed';
 
-  const handleSubmitReview = () => {
+  const handleReviewSubmit = (data: ReviewFormValues) => {
     if (onSubmitReview) {
-      onSubmitReview(reservation.id, rating, review);
-      setRating(0);
-      setReview('');
+      onSubmitReview(reservation.id, data.rating, data.review);
+      reset();
     }
   };
 
@@ -120,11 +139,12 @@ export default function ReservationCard({
                       </div>
                     </div>
 
+                    {/* Rating Stars */}
                     <div className="flex mx-auto mt-4">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          onClick={() => setRating(star)}
+                          onClick={() => setValue('rating', star)}
                           className={`size-12 cursor-pointer ${
                             rating >= star ? 'text-yellow' : 'text-gray-300'
                           }`}
@@ -134,15 +154,16 @@ export default function ReservationCard({
                     </div>
 
                     <textarea
-                      value={review}
-                      onChange={(e) => setReview(e.target.value)}
+                      {...register('review', {
+                        required: 'Please write a review',
+                      })}
                       placeholder="후기를 작성해주세요"
                       className="w-full h-40 border rounded mt-4 p-2 resize-none"
                     />
 
                     <div className="flex justify-end mt-4">
                       <button
-                        onClick={handleSubmitReview}
+                        onClick={handleSubmit(handleReviewSubmit)}
                         className="bg-green-dark text-white px-6 py-2 rounded-lg"
                       >
                         작성하기
