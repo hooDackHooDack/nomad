@@ -2,18 +2,20 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { ActivityFormInput } from '@/types/activity/activity';
+import { ActivityDetail, ActivityFormInput } from '@/types/activity/activity';
 import Image from 'next/image';
 import { alertModal } from '@/utils/alert/alertModal';
 import { steps } from '@/components/createActivity/layout/steps';
-import { createActivity } from '@/lib/api/activity';
+import { createActivity, updateActivity } from '@/lib/api/activity';
 import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
+import { useActivityFormDiff } from '@/hooks/activity/useActivityFormDiff';
 
 interface LayoutProps {
   children: React.ReactNode;
   mode: 'create' | 'edit';
   activityId?: string;
   initialValues: ActivityFormInput;
+  originalActivity?: ActivityDetail;
 }
 
 const ActivityCreateLayout = ({
@@ -21,6 +23,7 @@ const ActivityCreateLayout = ({
   mode,
   activityId,
   initialValues,
+  originalActivity,
 }: LayoutProps) => {
   const methods = useForm<ActivityFormInput>({
     mode: 'onChange',
@@ -29,6 +32,9 @@ const ActivityCreateLayout = ({
 
   const router = useRouter();
   const formValues = methods.watch();
+  const formDiff = useActivityFormDiff(originalActivity, formValues);
+
+
   const { reset } = methods;
   const {
     validateBasicStep,
@@ -239,7 +245,7 @@ const ActivityCreateLayout = ({
       refreshConfirmed.current = true;
 
       if (mode === 'edit' && activityId) {
-        // await updateActivity(activityId, data);
+        await updateActivity(activityId, data, formDiff);
         alertModal({
           icon: 'success',
           title: '액티비티가 성공적으로 수정되었습니다.',
