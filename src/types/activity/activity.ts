@@ -97,3 +97,12 @@ interface ScheduleDate {
 }
 
 export type CheckScheduleRes = ScheduleDate[];
+
+// 체험리스트 조회 API Parms 타입
+export interface FetchActivitiesParams {
+  cursorId?: number;
+  size?: number;
+  category?: string;
+  sort?: string;
+  keyword?: string;
+}
