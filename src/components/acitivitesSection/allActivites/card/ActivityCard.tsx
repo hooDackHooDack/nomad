@@ -1,6 +1,6 @@
 import { Activity } from '@/types/activity/activity';
 import Link from 'next/link';
-import CustomImage from '../fallback/CustomImage';
+import CustomImage from '../../../fallback/CustomImage';
 
 const ActivityCard = ({ activity }: { activity: Activity }) => (
   <Link
