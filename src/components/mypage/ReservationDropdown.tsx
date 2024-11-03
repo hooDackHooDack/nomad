@@ -13,7 +13,10 @@ const StatusDropdown = ({ value, onChange }: StatusDropdownProps) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -37,9 +40,11 @@ const StatusDropdown = ({ value, onChange }: StatusDropdownProps) => {
         aria-expanded={isOpen}
       >
         <span>
-          {value ? RESERVATION_STATUS[value as keyof typeof RESERVATION_STATUS] : '전체'}
+          {value
+            ? RESERVATION_STATUS[value as keyof typeof RESERVATION_STATUS]
+            : '전체'}
         </span>
-        <ChevronDown 
+        <ChevronDown
           className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}

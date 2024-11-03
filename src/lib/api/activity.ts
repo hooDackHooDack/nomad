@@ -40,3 +40,11 @@ export const checkSchedule = async ({
     },
   );
 };
+
+export const fetchMyActivities = async () => {
+  return authApi.get('/my-activities');
+};
+
+export const deleteMyActivity = async (activityId: number) => {
+  return authApi.delete(`/my-activities/${activityId}`);
+};
