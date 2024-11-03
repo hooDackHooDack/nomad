@@ -94,3 +94,33 @@ export interface FetchActivitiesParams {
   sort?: string;
   keyword?: string;
 }
+
+// 활동 수정 요청 타입
+export interface ActivityUpdateInput {
+  title: string;
+  category: string;
+  description: string;
+  price: number;
+  address: string;
+  bannerImageUrl: string;
+  subImageIdsToRemove: number[];
+  subImageUrlsToAdd: string[];
+  scheduleIdsToRemove: number[];
+  schedulesToAdd: Array<{
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
+}
+
+// ActivityFormInput에서 ActivityUpdateInput으로 변환 타입
+export interface ActivityFormDiff {
+  removedSubImageIds: number[];
+  addedSubImageUrls: string[];
+  removedScheduleIds: number[];
+  addedSchedules: Array<{
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>;
+}

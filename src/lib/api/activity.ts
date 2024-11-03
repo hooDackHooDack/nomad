@@ -6,6 +6,8 @@ import {
   ActivityReservation,
   FetchActivitiesParams,
   ActivityDetail,
+  ActivityFormDiff,
+  ActivityUpdateInput,
 } from '@/types/activity/activity';
 import authApi from '../axios/auth';
 import basicApi from '../axios/basic';
@@ -16,7 +18,7 @@ export const createActivity = async (data: ActivityFormInput) => {
 
 export const getActivityById = async (id: string) => {
   return authApi.get<ActivityDetail>(`/activities/${id}`);
-}
+};
 
 // 체험신청
 export const reservationsActivity = async ({
@@ -76,6 +78,26 @@ export const deleteMyActivity = async (activityId: number) => {
   return authApi.delete(`/my-activities/${activityId}`);
 };
 
-export const patchMyActivity = async (activityId: number, data: ActivityFormInput) => {
-  return authApi.patch(`/my-activities/${activityId}`, data);
-}
+export const updateActivity = async (
+  activityId: string,
+  formData: ActivityFormInput,
+  diff: ActivityFormDiff,
+) => {
+  const updateData: ActivityUpdateInput = {
+    title: formData.title,
+    category: formData.category,
+    description: formData.description,
+    price: formData.price,
+    address: formData.address,
+    bannerImageUrl: formData.bannerImageUrl,
+    subImageIdsToRemove: diff.removedSubImageIds,
+    subImageUrlsToAdd: diff.addedSubImageUrls,
+    scheduleIdsToRemove: diff.removedScheduleIds,
+    schedulesToAdd: diff.addedSchedules,
+  };
+
+  return authApi.patch<ActivityDetail>(
+    `/my-activities/${activityId}`,
+    updateData,
+  );
+};
