@@ -40,7 +40,7 @@ const MyActivityCard = ({ activity, onDelete }) => {
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
-              <Link href={`/activities/${activity.id}/edit`}>
+              <Link href={`/activities/edit/basic?id=${activity.id}`}>
                 <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
                   수정하기
                 </DropdownMenuItem>
