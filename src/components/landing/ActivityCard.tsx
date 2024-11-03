@@ -1,6 +1,6 @@
 import { Activity } from '@/types/activity/activity';
 import Link from 'next/link';
-import Image from 'next/image';
+import CustomImage from '../fallback/CustomImage';
 
 const ActivityCard = ({ activity }: { activity: Activity }) => (
   <Link
@@ -8,7 +8,7 @@ const ActivityCard = ({ activity }: { activity: Activity }) => (
     className="block w-full transition-transform duration-200 hover:scale-105"
   >
     <div className="w-full cursor-pointer">
-      <Image
+      <CustomImage
         src={activity.bannerImageUrl}
         alt={activity.title}
         className="w-full h-48 object-cover rounded-xl mb-4"

@@ -1,8 +1,8 @@
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import Image from 'next/image';
 import Link from 'next/link';
+import CustomImage from '../fallback/CustomImage';
 
 const PopularActivities = ({ activities }) => {
   const settings = {
@@ -65,7 +65,7 @@ const PopularActivities = ({ activities }) => {
         <Slider {...settings}>
           {activities?.map((activity) => (
             <div key={activity.id} className="px-2">
-              <div className="relative w-full min-[701px]:w-[350px] min-[1102px]:w-[400px] h-[500px] cursor-pointer bg-gray-100 rounded-lg flex flex-col justify-around group">
+              <div className="relative w-full min-[701px]:w-[350px] min-[1102px]:w-[400px] h-[500px] cursor-pointer bg-gray-50 rounded-lg flex flex-col justify-around group">
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-lg z-10">
                   <Link href={`/activities/${activity.id}`}>
@@ -76,7 +76,7 @@ const PopularActivities = ({ activities }) => {
                 </div>
 
                 <div className="overflow-hidden flex justify-center">
-                  <Image
+                  <CustomImage
                     src={activity.bannerImageUrl}
                     width={300}
                     height={250}
