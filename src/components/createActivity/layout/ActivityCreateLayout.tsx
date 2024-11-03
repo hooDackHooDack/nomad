@@ -9,17 +9,22 @@ import { steps } from '@/components/createActivity/layout/steps';
 import { createActivity } from '@/lib/api/activity';
 import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
 
-const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+  mode: 'create' | 'edit';
+  activityId?: string;
+  initialValues: ActivityFormInput;
+}
+
+const ActivityCreateLayout = ({
+  children,
+  mode,
+  activityId,
+  initialValues,
+}: LayoutProps) => {
   const methods = useForm<ActivityFormInput>({
     mode: 'onChange',
-    defaultValues: {
-      title: '',
-      category: '',
-      description: '',
-      address: '',
-      bannerImageUrl: '',
-      subImageUrls: [],
-    },
+    defaultValues: initialValues,
   });
 
   const router = useRouter();
@@ -30,9 +35,9 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     validateLocationStep,
     validateScheduleStep,
     validateImageStep,
-    isFormValid
+    isFormValid,
   } = useFormValidation(formValues);
-  
+
   const [alertShown, setAlertShown] = useState(false);
   const [lastSavedValues, setLastSavedValues] =
     useState<ActivityFormInput | null>(null);
@@ -225,40 +230,51 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const handleSubmit = methods.handleSubmit(async (data) => {
+  const handleFormSubmit = async (data: ActivityFormInput) => {
     if (!isFormValid()) {
       return;
     }
 
     try {
       refreshConfirmed.current = true;
-      console.log('Submit data:', data);
-      console.log(typeof data.price);
-      await createActivity(data);
+
+      if (mode === 'edit' && activityId) {
+        // await updateActivity(activityId, data);
+        alertModal({
+          icon: 'success',
+          title: '액티비티가 성공적으로 수정되었습니다.',
+          text: '액티비티 상세 페이지로 이동합니다.',
+          confirmButtonText: '확인',
+          confirmedFunction: () => {
+            router.push(`/activities/${activityId}`);
+          },
+        });
+      } else {
+        const response = await createActivity(data);
+        console.log('Activity created:', response);
+        alertModal({
+          icon: 'success',
+          title: '액티비티가 성공적으로 등록되었습니다.',
+          text: '액티비티 목록 페이지로 이동합니다.',
+          confirmButtonText: '확인',
+          confirmedFunction: () => {
+            router.push('/activities');
+          },
+        });
+      }
 
       localStorage.removeItem('activityFormDraft');
       setLastSavedValues(null);
-
-      alertModal({
-        icon: 'success',
-        title: '액티비티가 성공적으로 등록되었습니다.',
-        text: '액티비티 목록 페이지로 이동합니다.',
-        confirmButtonText: '확인',
-        confirmedFunction: () => {
-          router.push('/activities');
-        },
-      });
-      console.log('Submit data:', data);
     } catch (error) {
       console.error('Form submit error:', error);
       alertModal({
         icon: 'error',
-        title: '액티비티 등록 실패',
-        text: '액티비티 등록 중 오류가 발생했습니다.',
+        title: `액티비티 ${mode === 'edit' ? '수정' : '등록'} 실패`,
+        text: `액티비티 ${mode === 'edit' ? '수정' : '등록'} 중 오류가 발생했습니다.`,
         confirmButtonText: '확인',
       });
     }
-  });
+  };
 
   const getCurrentStepId = () => {
     const path = router.asPath;
@@ -316,7 +332,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={methods.handleSubmit(handleFormSubmit)}>
         <div className="min-h-screen bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-12 gap-8">
@@ -334,7 +350,7 @@ const ActivityCreateLayout = ({ children }: { children: React.ReactNode }) => {
                     return (
                       <Link
                         key={step.id}
-                        href={step.path}
+                        href={`/activities/${mode}/${step.path}${mode === 'edit' ? `?id=${activityId}` : ''}`}
                         className={getStepStyles(status)}
                       >
                         <span className="mr-3">

@@ -1,26 +1,27 @@
+// components/createActivity/layout/steps.ts
 export const steps = [
   {
     id: 'basic',
     title: '기본 정보',
-    path: '/activities/create/basic',
+    path: 'basic',
     image: '/images/number/one.png',
   },
   {
     id: 'location',
-    title: '주소',
-    path: '/activities/create/location',
+    title: '위치 정보',
+    path: 'location',
     image: '/images/number/two.png',
   },
   {
     id: 'schedule',
-    title: '일정',
-    path: '/activities/create/schedule',
+    title: '일정 관리',
+    path: 'schedule',
     image: '/images/number/three.png',
   },
   {
     id: 'images',
-    title: '이미지',
-    path: '/activities/create/images',
+    title: '이미지 등록',
+    path: 'images',
     image: '/images/number/four.png',
   },
 ];
