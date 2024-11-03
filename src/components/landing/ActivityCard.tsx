@@ -5,26 +5,38 @@ import CustomImage from '../fallback/CustomImage';
 const ActivityCard = ({ activity }: { activity: Activity }) => (
   <Link
     href={`/activities/${activity.id}`}
-    className="block w-full transition-transform duration-200 hover:scale-105"
+    className="block w-full h-full transition-transform duration-200 hover:scale-105"
   >
-    <div className="w-full cursor-pointer">
+    <div className="w-full h-full bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer overflow-hidden">
       <CustomImage
         src={activity.bannerImageUrl}
         alt={activity.title}
-        className="w-full h-48 object-cover rounded-xl mb-4"
-        width={200}
-        height={200}
+        className="w-full h-64 object-cover"
+        width={400}
+        height={400}
       />
 
-      <p className="text-lg mb-3">
-        ⭐ {activity.rating}
-        <span className="text-gray-500 ml-1">({activity.reviewCount})</span>
-      </p>
-      <p className="text-2xl font-semibold mb-2 truncate">{activity.title}</p>
-      <p className="text-2xl font-bold mb-2">
-        ₩ {activity.price}
-        <span className="text-lg text-gray-700 ml-1">/ 인</span>
-      </p>
+      <div className="p-5">
+        <div className="flex items-center mb-4">
+          <span className="flex items-center text-lg text-yellow-500">
+            ⭐ {activity.rating}
+          </span>
+          <span className="text-gray-500 ml-2">
+            리뷰 {activity.reviewCount}개
+          </span>
+        </div>
+
+        <h3 className="text-xl font-semibold mb-4 line-clamp-2 min-h-[3.5rem]">
+          {activity.title}
+        </h3>
+
+        <div className="mt-auto pt-4 border-t border-gray-100">
+          <p className="text-2xl font-bold text-green-dark">
+            ₩ {activity.price.toLocaleString()}
+            <span className="text-lg text-gray-600 font-normal ml-1">/ 인</span>
+          </p>
+        </div>
+      </div>
     </div>
   </Link>
 );
