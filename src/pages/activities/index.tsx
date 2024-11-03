@@ -4,9 +4,9 @@ import { ActivitiesResponse } from '@/types/activity/activity';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import PopularActivities from '@/components/popular/PopularActivities';
-import { Search, SlidersHorizontal } from 'lucide-react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import FilterSection from '@/components/landing/FilterSection';
 
 interface FetchActivitiesParams {
   cursorId?: number;
@@ -138,27 +138,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSortChange = (selectedSort: string) => {
-    setSort(selectedSort);
-  };
-
-  const handleCategoryChange = (selectedCategory: string) => {
-    if (category === selectedCategory) {
-      setCategory('');
-    } else {
-      setCategory(selectedCategory);
-    }
-  };
-
-  const categories = [
-    '문화 · 예술',
-    '식음료',
-    '스포츠',
-    '투어',
-    '관광',
-    '웰빙',
-  ];
-
   const allActivities =
     data?.pages.flatMap((page: ActivitiesResponse) => page.activities) ?? [];
 
@@ -175,8 +154,8 @@ export default function Home() {
       <PopularActivities activities={popularActivities?.activities} />
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900">모든 체험</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">🛼 모든 체험</h1>
         </div>
 
         <div ref={filterWrapperRef} className="relative mb-12">
@@ -189,65 +168,24 @@ export default function Home() {
             }`}
           >
             <div
-              className={`max-w-[1920px] mx-auto ${isFilterSticky ? 'px-4 py-4' : 'p-6'}`}
+              ref={filterRef}
+              className={`bg-white backdrop-blur-sm transition-all duration-300 ${
+                isFilterSticky
+                  ? 'fixed top-0 left-0 right-0 z-50 shadow-lg'
+                  : 'rounded-2xl shadow-md'
+              }`}
             >
-              <div className="flex flex-col space-y-6">
-                {/* Categories */}
-                <div className="flex flex-wrap gap-3 justify-center">
-                  {categories.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => handleCategoryChange(c)}
-                      className={`
-                        px-6 py-2.5 rounded-full text-sm font-medium 
-                        transition-all duration-200 transform hover:scale-105
-                        ${
-                          category === c
-                            ? 'bg-green-dark text-white shadow-lg ring-2 ring-offset-2 ring-green-dark'
-                            : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-green-dark hover:text-green-dark'
-                        }
-                      `}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Search and Sort */}
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-3xl mx-auto">
-                  <div className="relative flex w-full sm:w-auto">
-                    <input
-                      type="text"
-                      value={keyword}
-                      onChange={(e) => setKeyword(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-full
-                        focus:outline-none focus:ring-2 focus:ring-green-dark focus:border-transparent
-                        text-gray-800 placeholder-gray-400"
-                      placeholder="검색어를 입력하세요"
-                    />
-                    <Search
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />{' '}
-                    <div className="relative w-full sm:w-48">
-                      <select
-                        value={sort}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="w-full appearance-none bg-white pl-4 pr-12 py-3 border-2 
-                        border-gray-200 rounded-full text-gray-700
-                        focus:outline-none focus:ring-2 focus:ring-green-dark focus:border-transparent"
-                      >
-                        <option value="">정렬 기준</option>
-                        <option value="price_asc">가격 낮은 순</option>
-                        <option value="price_desc">가격 높은 순</option>
-                      </select>
-                      <SlidersHorizontal
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                        size={20}
-                      />
-                    </div>
-                  </div>
-                </div>
+              <div
+                className={`max-w-[1920px] mx-auto ${isFilterSticky ? 'px-4 py-6 bg-gray-50' : 'p-4'}`}
+              >
+                <FilterSection
+                  category={category}
+                  setCategory={setCategory}
+                  sort={sort}
+                  setSort={setSort}
+                  keyword={keyword}
+                  setKeyword={setKeyword}
+                />
               </div>
             </div>
           </div>
