@@ -1,15 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
-import { Star } from 'lucide-react';
-import { MoreVertical } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
+import { Star, MoreVertical } from 'lucide-react';
+import Dropdown, { DropdownOption } from '@/components/Dropdown';
 
 const MyActivityCard = ({ activity, onDelete }) => {
+  const options: DropdownOption[] = [
+    { label: '수정하기', value: `edit` },
+    { label: '삭제하기', value: `delete` },
+  ];
+
+  const handleSelect = (value: string | number) => {
+    if (value === 'edit') {
+      window.location.href = `/activities/edit/basic?id=${activity.id}`;
+    } else if (value === 'delete') {
+      onDelete?.(activity.id);
+    }
+  };
+
   return (
     <div className="flex bg-white rounded-lg shadow-md h-36">
       <div className="size-36 flex-shrink-0">
@@ -32,27 +38,17 @@ const MyActivityCard = ({ activity, onDelete }) => {
         </div>
         <div className="flex justify-between items-center">
           <p className="font-bold">₩ {activity.price.toLocaleString()}</p>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="border-none focus:outline-none">
+          <Dropdown
+            trigger={
               <MoreVertical
                 size={20}
-                className="text-gray-500 hover:text-gray-700 outline-none"
+                className="text-gray-500 hover:text-gray-700 cursor-pointer"
               />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <Link href={`/activities/edit/basic?id=${activity.id}`}>
-                <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
-                  수정하기
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem
-                onClick={() => onDelete?.(activity.id)}
-                className="flex items-center justify-center cursor-pointer"
-              >
-                삭제하기
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            options={options}
+            onSelect={handleSelect}
+            align="end"
+          />
         </div>
       </div>
     </div>
