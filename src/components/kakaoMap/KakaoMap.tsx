@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface KakaoMapProps {
   address?: string;
@@ -15,25 +15,45 @@ declare global {
 
 export const KakaoMap = ({
   address,
-  defaultLat = 37.5666805, // 기본값: 서울 시청
+  defaultLat = 37.5666805,
   defaultLng = 126.9784147,
   className = 'w-full h-96 rounded-lg border bg-gray-100',
 }: KakaoMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markerInstance = useRef<any>(null);
+  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false);
 
-  // 지도 초기화
+  // 카카오맵 스크립트 로딩 상태 체크
   useEffect(() => {
-    const initMap = () => {
-      if (!mapRef.current || !window.kakao?.maps) return;
+    const checkKakaoMap = () => {
+      if (window.kakao?.maps) {
+        // 서비스 라이브러리 로드
+        window.kakao.maps.load(() => {
+          setIsKakaoLoaded(true);
+        });
+      } else {
+        setTimeout(checkKakaoMap, 100);
+      }
+    };
 
+    checkKakaoMap();
+  }, []);
+
+  // 지도 초기화 및 주소 설정
+  useEffect(() => {
+    if (!isKakaoLoaded || !mapRef.current) return;
+
+    const initializeMap = (coords?: { lat: number; lng: number }) => {
       try {
         const { maps } = window.kakao;
         const { Map, LatLng, Marker } = maps;
 
         const options = {
-          center: new LatLng(defaultLat, defaultLng),
+          center: new LatLng(
+            coords?.lat ?? defaultLat,
+            coords?.lng ?? defaultLng,
+          ),
           level: 3,
         };
 
@@ -41,53 +61,43 @@ export const KakaoMap = ({
         mapInstance.current = map;
 
         const marker = new Marker({
-          position: new LatLng(defaultLat, defaultLng),
+          position: new LatLng(
+            coords?.lat ?? defaultLat,
+            coords?.lng ?? defaultLng,
+          ),
           map: map,
         });
         markerInstance.current = marker;
+
+        // 주소가 있을 경우 지오코딩 수행
+        if (address) {
+          const geocoder = new window.kakao.maps.services.Geocoder();
+          geocoder.addressSearch(address, (result: any, status: any) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = {
+                lat: Number(result[0].y),
+                lng: Number(result[0].x),
+              };
+
+              const moveLatLng = new LatLng(coords.lat, coords.lng);
+              map.setCenter(moveLatLng);
+              marker.setPosition(moveLatLng);
+            }
+          });
+        }
       } catch (error) {
         console.error('Map initialization error:', error);
       }
     };
 
-    const loadKakaoMap = () => {
-      const { kakao } = window;
-      if (kakao && kakao.maps) {
-        kakao.maps.load(initMap);
-      } else {
-        setTimeout(loadKakaoMap, 100);
-      }
-    };
-
-    loadKakaoMap();
+    initializeMap();
 
     return () => {
       if (markerInstance.current) {
         markerInstance.current.setMap(null);
       }
     };
-  }, [defaultLat, defaultLng]);
-
-  // 주소가 변경될 때 지도 업데이트
-  useEffect(() => {
-    if (!address || !window.kakao?.maps || !mapInstance.current) return;
-
-    const { maps } = window.kakao;
-    const { services, LatLng } = maps;
-    const geocoder = new services.Geocoder();
-
-    geocoder.addressSearch(address, (result: any, status: any) => {
-      if (status === services.Status.OK) {
-        const coords = new LatLng(result[0].y, result[0].x);
-
-        if (markerInstance.current) {
-          markerInstance.current.setPosition(coords);
-        }
-
-        mapInstance.current.setCenter(coords);
-      }
-    });
-  }, [address]);
+  }, [address, defaultLat, defaultLng, isKakaoLoaded]);
 
   return <div ref={mapRef} className={className} />;
 };
