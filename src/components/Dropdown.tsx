@@ -1,5 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 
+/**
+ * @component Dropdown
+ * @param trigger - 버튼, 아이콘 등
+ * @param options - 드롭다운에 표시될 목록, { label, value }
+ * @param onSelect - 옵션 선택된 값 전달
+ * @param align - 드롭다운 정렬
+ * @param className - 스타일 추가
+ *
+ * @example
+ * // 사용 예시
+ * const options = [
+ *   { label: '옵션 1', value: 'option1' },
+ *   { label: '옵션 2', value: 'option2' },
+ * ];
+ *
+ * <Dropdown
+ *   trigger={<button>드롭다운 열기</button>}
+ *   options={options}
+ *   onSelect={(value) => console.log('선택된 값:', value)}
+ *   align="start"
+ * />
+ */
+
 interface DropdownOption {
   label: string;
   value: string | number;
@@ -33,8 +56,8 @@ const Dropdown = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleSelect = (value: string | number) => {
