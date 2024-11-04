@@ -6,6 +6,7 @@ import Header from '@/components/header/Header';
 import 'react-quill/dist/quill.snow.css';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
+import Footer from '@/components/footer/Footer';
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       )}
       <Header />
       <Component {...pageProps} />
+      <Footer />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
