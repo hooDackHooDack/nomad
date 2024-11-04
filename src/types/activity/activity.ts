@@ -124,3 +124,24 @@ export interface ActivityFormDiff {
     endTime: string;
   }>;
 }
+
+// ActivityReview 타입
+export interface Review {
+  id: number;
+  user: {
+    profileImageUrl: string;
+    nickname: string;
+    id: number;
+  };
+  activityId: number;
+  rating: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+// 체험리뷰 조회 응답 타입
+export interface ActivitiesReview {
+  averageRating: number;
+  totalCount: number;
+  reviews: Review[];
+}

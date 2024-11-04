@@ -101,3 +101,17 @@ export const updateActivity = async (
     updateData,
   );
 };
+
+// 체험 개별아이템 리뷰 조회
+export const getReview = async (
+  activityId: number,
+  page: number,
+  size: number,
+) => {
+  return basicApi.get(`/activities/${activityId}/reviews`, {
+    params: {
+      page,
+      size,
+    },
+  });
+};
