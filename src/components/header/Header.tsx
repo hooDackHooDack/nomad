@@ -34,7 +34,7 @@ const Header = () => {
 
   return (
     <div className="w-full mx-auto border-b border-gray-200">
-      <div className="max-w-[1200px] flex items-center justify-between p-5 mx-auto">
+      <div className="flex items-center justify-between p-5 mx-auto">
         <Link href="/activities">
           <Logo />
         </Link>
