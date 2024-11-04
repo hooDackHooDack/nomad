@@ -1,42 +1,82 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Bell } from 'lucide-react';
 import { useAuth, logout } from '@/hooks/auth/useAuth';
 import Logo from '/public/logo/logo_row.svg';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
-  /**
-   * @todo
-   * 1. 로그인 되어있으면 유저 프로필(회원가입 버튼 삭제)
-   * 2. 헤더 네비게이션 고민
-   * 3. 로고 고민
-   */
   const { user, isLoading } = useAuth();
+  const pathname = usePathname();
 
   if (isLoading) return null;
-  if (window.location.pathname === '/') return null;
+  if (pathname === '/') return null;
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
-    <div className="w-full mx-auto border-b-[1px] border-gray-200">
-      <div className="max-w-[1200px] flex justify-between p-5 mx-auto">
+    <div className="w-full mx-auto border-b border-gray-200">
+      <div className="max-w-[1200px] flex items-center justify-between p-5 mx-auto">
         <Link href="/activities">
           <Logo />
         </Link>
-        <div className="">
+
+        <div className="flex items-center gap-4">
           {user ? (
-            <div className="flex gap-2">
-              <Link href="/mypage">
-                <img
-                  src={user.profileImageUrl}
-                  alt="profile"
-                  className="w-8 h-8 rounded-full"
-                />
-              </Link>
-              <p>{user.nickname}</p>
-              <button onClick={logout}>로그아웃</button>
-            </div>
+            <>
+              <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <div className="w-[1px] h-4 bg-gray-600"></div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-3 border-none">
+                  <img
+                    src={user.profileImageUrl}
+                    alt="profile"
+                    className="size-8 rounded-full object-cover"
+                  />
+                  <span className="font-medium text-gray-600">
+                    {user.nickname}
+                  </span>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="w-full">
+                  <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
+                    <Link href="/mypage">마이 페이지</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
+                    <Link href="/activities/create/basic">체험 등록</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex items-center justify-center cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    로그아웃
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
-            <Link href="/auth/login">로그인</Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/auth/login"
+                className={`${
+                  pathname === '/auth/login'
+                    ? 'text-green-dark'
+                    : 'text-gray-600'
+                } hover:text-gray-900`}
+              >
+                로그인
+              </Link>
+            </div>
           )}
         </div>
-        <Link href="/activities/create/basic">체험등록만들기</Link>
       </div>
     </div>
   );
