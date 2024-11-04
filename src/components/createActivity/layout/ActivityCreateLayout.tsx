@@ -9,6 +9,7 @@ import { steps } from '@/components/createActivity/layout/steps';
 import { createActivity, updateActivity } from '@/lib/api/activity';
 import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
 import { useActivityFormDiff } from '@/hooks/activity/useActivityFormDiff';
+import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,10 +31,10 @@ const ActivityCreateLayout = ({
     defaultValues: initialValues,
   });
 
+  const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const formValues = methods.watch();
   const formDiff = useActivityFormDiff(originalActivity, formValues);
-
 
   const { reset } = methods;
   const {
@@ -335,6 +336,10 @@ const ActivityCreateLayout = ({
         return `${baseStyle} bg-gray-50 text-gray-700 hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]`;
     }
   };
+
+  if (isLoading || !user) {
+    return null;
+  }
 
   return (
     <FormProvider {...methods}>
