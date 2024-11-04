@@ -9,9 +9,14 @@ interface ReservationData {
 interface CalendarDayContentProps {
   date: Date;
   reservation?: ReservationData;
+  onClick: () => void;
 }
 
-const CalendarDayContent = ({ date, reservation }: CalendarDayContentProps) => {
+const CalendarDayContent = ({
+  date,
+  reservation,
+  onClick,
+}: CalendarDayContentProps) => {
   const hasReservations =
     reservation &&
     (reservation.completed > 0 ||
@@ -19,7 +24,7 @@ const CalendarDayContent = ({ date, reservation }: CalendarDayContentProps) => {
       reservation.pending > 0);
 
   return (
-    <div className="relative h-24 w-24 p-0 border-y">
+    <div className="relative h-24 w-24 p-0 border-y cursor-pointer" onClick={onClick}>
       <div className="absolute top-2 left-2 flex items-center gap-1">
         <span>{format(date, 'd')}</span>
         {hasReservations && (

@@ -4,10 +4,15 @@ import { Calendar } from '@/components/ui/calendar';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { fetchMyActivities, fetchMyActivitiesByDate, Reservation } from '@/lib/api/activity';
+import {
+  fetchMyActivities,
+  fetchMyActivitiesByDate,
+  Reservation,
+} from '@/lib/api/activity';
 import CalendarDayContent from '@/components/mypage/mycalendar/CalendarDayContent';
 import ReservationColor from '@/components/mypage/mycalendar/ReservationColor';
 import ActivityDropdown from '@/components/mypage/mycalendar/ActivityDropdown';
+import ReservationDetail from '@/components/mypage/mycalendar/ReservationDetail';
 
 interface Activity {
   id: number;
@@ -20,13 +25,13 @@ interface ActivityResponse {
   cursorId: null;
 }
 
-
-
 const MyCalendarPage = () => {
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedActivityTitle, setSelectedActivityTitle] =
     useState<string>('체험을 선택하세요');
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { data: activitiesResponse, isLoading } = useQuery<ActivityResponse>({
     queryKey: ['myActivities'],
@@ -59,7 +64,11 @@ const MyCalendarPage = () => {
       if (!selectedActivity) return [];
       const year = format(currentMonth, 'yyyy');
       const month = format(currentMonth, 'MM');
-      const response = await fetchMyActivitiesByDate(selectedActivity, year, month);
+      const response = await fetchMyActivitiesByDate(
+        selectedActivity,
+        year,
+        month,
+      );
       return response.data;
     },
     enabled: !!selectedActivity,
@@ -84,6 +93,16 @@ const MyCalendarPage = () => {
     setCurrentMonth(date);
   };
 
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+    setSelectedDate(null);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -103,7 +122,7 @@ const MyCalendarPage = () => {
           <Calendar
             mode="single"
             selected={currentMonth}
-            onSelect={(newDate) => newDate && setCurrentMonth(newDate)}
+            onSelect={(newDate) => newDate && handleDateClick(newDate)}
             onMonthChange={handleMonthChange}
             locale={ko}
             className="rounded-md"
@@ -124,12 +143,21 @@ const MyCalendarPage = () => {
                   <CalendarDayContent
                     date={date}
                     reservation={reservation?.reservations}
+                    onClick={() => handleDateClick(date)}
                     {...props}
                   />
                 );
               },
             }}
           />
+          {selectedDate && (
+            <ReservationDetail
+              date={selectedDate}
+              activityId={selectedActivity}
+              isOpen={isDrawerOpen}
+              onOpenChange={handleDrawerClose}
+            />
+          )}
         </div>
 
         <ReservationColor />
