@@ -4,8 +4,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { fetchMyActivities } from '@/lib/api/activity';
-import authApi from '@/lib/axios/auth';
+import { fetchMyActivities, fetchMyActivitiesByDate, Reservation } from '@/lib/api/activity';
 import CalendarDayContent from '@/components/mypage/mycalendar/CalendarDayContent';
 import ReservationColor from '@/components/mypage/mycalendar/ReservationColor';
 import ActivityDropdown from '@/components/mypage/mycalendar/ActivityDropdown';
@@ -21,14 +20,7 @@ interface ActivityResponse {
   cursorId: null;
 }
 
-interface Reservation {
-  date: string;
-  reservations: {
-    completed: number;
-    confirmed: number;
-    pending: number;
-  };
-}
+
 
 const MyCalendarPage = () => {
   const [selectedActivity, setSelectedActivity] = useState('');
@@ -65,9 +57,9 @@ const MyCalendarPage = () => {
     ],
     queryFn: async () => {
       if (!selectedActivity) return [];
-      const response = await authApi.get(
-        `/my-activities/${selectedActivity}/reservation-dashboard?year=${format(currentMonth, 'yyyy')}&month=${format(currentMonth, 'MM')}`,
-      );
+      const year = format(currentMonth, 'yyyy');
+      const month = format(currentMonth, 'MM');
+      const response = await fetchMyActivitiesByDate(selectedActivity, year, month);
       return response.data;
     },
     enabled: !!selectedActivity,
