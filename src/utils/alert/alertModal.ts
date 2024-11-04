@@ -6,6 +6,7 @@ interface Props {
   icon?: 'success' | 'error' | 'warning' | 'info' | 'question';
   confirmButtonText?: string;
   timer?: number;
+  willClose?: () => void;
   showCancelButton?: boolean;
   cancelButtonText?: string;
   confirmedFunction?: () => void;
@@ -31,6 +32,7 @@ export function alertModal({
   confirmButtonText = '확인',
   cancelButtonText,
   timer,
+  willClose,
   confirmedFunction,
   confirmedDismiss,
 }: Props) {
@@ -46,6 +48,7 @@ export function alertModal({
     customClass: {
       confirmButton: 'text-[#FAFAFA]',
     },
+    willClose: willClose,
   }).then((result) => {
     if (result.isConfirmed && confirmedFunction) {
       confirmedFunction();

@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { User, Settings, History, Calendar } from 'lucide-react';
 import { useAuth } from '@/hooks/auth/useAuth';
+import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
 
 const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const currentPath = router.pathname;
 
   const { user } = useAuth();
+  const { user: userLogin, isLoading } = useRequireAuth();
 
   const navigationItems = [
     {
@@ -35,6 +37,10 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   const isActivePath = (path: string) => currentPath === path;
+
+  if (isLoading || !userLogin) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

@@ -36,12 +36,12 @@ const ActivityReservation = ({
       'availableSchedules',
       activityId,
       format(currentMonth, 'yyyy'),
-      format(currentMonth, 'M'),
+      format(currentMonth, 'MM'),
     ],
     queryFn: () =>
       checkSchedule({
         year: parseInt(format(currentMonth, 'yyyy')),
-        month: parseInt(format(currentMonth, 'M')),
+        month: parseInt(format(currentMonth, 'MM')),
         activityId,
       }),
     enabled: open,
@@ -225,7 +225,7 @@ const ActivityReservation = ({
                         </div>
                       ) : (
                         <div className="text-gray-500 text-center py-8">
-                          {format(selectedDate, 'M')}월의 이용 가능한 시간이
+                          {format(selectedDate, 'MM')}월의 이용 가능한 시간이
                           없습니다.
                         </div>
                       )}

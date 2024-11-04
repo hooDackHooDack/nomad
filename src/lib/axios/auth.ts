@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import Cookies from 'js-cookie';
-import { logout } from '@/hooks/auth/useAuth';
 import { jwtDecode } from 'jwt-decode';
 import basicApi from './basic';
+import { alertModal } from '@/utils/alert/alertModal';
 
 interface JWTPayload {
   exp: number;
@@ -61,9 +61,25 @@ const refreshAccessToken = async (
     return data.accessToken;
   } catch (error) {
     console.error('토큰 갱신 실패:', error);
-
     return null;
   }
+};
+
+const handleUnauthorized = () => {
+  const redirectToLogin = () => {
+    window.location.href = '/auth/login';
+  };
+
+  alertModal({
+    title: '로그인이 필요합니다',
+    text: '로그인 페이지로 이동합니다.',
+    icon: 'warning',
+    confirmButtonText: '확인',
+    timer: 3000,
+    confirmedFunction: redirectToLogin,
+    // willClose callback을 추가하여 모달이 닫힐 때도 리다이렉트
+    willClose: redirectToLogin,
+  });
 };
 
 const authApi: AxiosInstance = axios.create({
@@ -73,16 +89,20 @@ const authApi: AxiosInstance = axios.create({
     Accept: 'application/json',
   },
 });
+
 authApi.interceptors.request.use(
   async (config) => {
     const accessToken = Cookies.get('accessToken');
 
-    if (!accessToken) return config;
+    if (!accessToken) {
+      handleUnauthorized();
+      return config;
+    }
 
     const { isValid, remainingTime } = validateToken(accessToken);
 
     if (!isValid) {
-      logout();
+      handleUnauthorized();
       throw new Error('Token expired');
     }
 
@@ -96,7 +116,7 @@ authApi.interceptors.request.use(
             onRefreshed(newToken);
             config.headers.Authorization = `Bearer ${newToken}`;
           } else {
-            logout();
+            handleUnauthorized();
             throw new Error('Token refresh failed');
           }
         } finally {
@@ -122,8 +142,11 @@ authApi.interceptors.request.use(
 authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      logout();
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.message === 'Unauthorized'
+    ) {
+      handleUnauthorized();
     }
     return Promise.reject(error);
   },
