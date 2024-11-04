@@ -7,6 +7,7 @@ import KakaoMap from '@/components/kakaoMap/KakaoMap';
 import LocationIcon from '/public/icons/button/Location.svg';
 import Image from 'next/image';
 import ActivityReservation from '@/components/booking/ActivityReservation';
+import { ReviewSection } from '@/components/review/ReviewSection';
 
 const fetchActivityDetail = async (activityId: string) => {
   const { data } = await basicApi.get<Activity>(`activities/${activityId}`);
@@ -137,6 +138,11 @@ const ActivityDetailPage = () => {
                     {activity.address}
                   </p>
                 </div>
+              </div>
+              <div className="w-full h-[1px] bg-[#112211] opacity-25 mb-8" />
+              {/* 후기 container */}
+              <div>
+                <ReviewSection activityId={activity.id} />
               </div>
             </div>
           </div>
