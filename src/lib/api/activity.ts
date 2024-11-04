@@ -38,12 +38,13 @@ export const checkSchedule = async ({
   month,
   activityId,
 }: CheckSchedule) => {
+  const formattedMonth = month.toString().padStart(2, '0');
   return basicApi.get<CheckScheduleRes>(
     `/activities/${activityId}/available-schedule`,
     {
       params: {
         year,
-        month,
+        month: formattedMonth,
       },
     },
   );
