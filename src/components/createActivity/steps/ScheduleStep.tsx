@@ -34,7 +34,12 @@ const ScheduleStep = () => {
       endTime: tempEndTime,
     };
 
-    setValue('schedules', [...schedules, newSchedule]);
+    // 빈 값이 아닌 실제 데이터만 필터링
+    const filteredSchedules = schedules.filter(
+      (schedule) => schedule.date && schedule.startTime && schedule.endTime,
+    );
+
+    setValue('schedules', [...filteredSchedules, newSchedule]);
 
     setTempDate('');
     setTempStartTime('');
@@ -45,6 +50,11 @@ const ScheduleStep = () => {
     const newSchedules = schedules.filter((_, i) => i !== index);
     setValue('schedules', newSchedules);
   };
+
+  // 실제로 유효한 스케줄만 필터링
+  const validSchedules = schedules.filter(
+    (schedule) => schedule.date && schedule.startTime && schedule.endTime,
+  );
 
   return (
     <div className="space-y-4">
@@ -114,9 +124,9 @@ const ScheduleStep = () => {
 
       <div className="bg-gray-50 rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">등록된 일정</h3>
-        {schedules.length > 0 ? (
+        {validSchedules.length > 0 ? (
           <div className="space-y-3">
-            {schedules.map((schedule, index) => (
+            {validSchedules.map((schedule, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div className="flex-1 bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center gap-6">
@@ -127,9 +137,7 @@ const ScheduleStep = () => {
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
                       <div>
-                        {schedule.startTime && schedule.endTime
-                          ? `${formatTime(schedule.startTime)} ~ ${formatTime(schedule.endTime)}`
-                          : ''}
+                        {`${formatTime(schedule.startTime)} ~ ${formatTime(schedule.endTime)}`}
                       </div>
                     </div>
                   </div>
