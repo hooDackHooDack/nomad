@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import MyPageLayout from '@/components/mypage/MypageLayout';
 import { Calendar } from '@/components/ui/calendar';
-import Dropdown from '@/components/Dropdown';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ChevronDown } from 'lucide-react';
 import { fetchMyActivities } from '@/lib/api/activity';
 import authApi from '@/lib/axios/auth';
+import CalendarDayContent from '@/components/mypage/mycalendar/CalendarDayContent';
+import ReservationColor from '@/components/mypage/mycalendar/ReservationColor';
+import ActivityDropdown from '@/components/mypage/mycalendar/ActivityDropdown';
 
 interface Activity {
   id: number;
@@ -35,7 +36,6 @@ const MyCalendarPage = () => {
     useState<string>('체험을 선택하세요');
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
-  // Fetch activities
   const { data: activitiesResponse, isLoading } = useQuery<ActivityResponse>({
     queryKey: ['myActivities'],
     queryFn: async () => {
@@ -56,7 +56,6 @@ const MyCalendarPage = () => {
     }
   }, [activities, selectedActivity, isLoading]);
 
-  // Fetch reservations for selected activity and current month
   const { data: reservations } = useQuery<Reservation[]>({
     queryKey: [
       'reservations',
@@ -102,20 +101,11 @@ const MyCalendarPage = () => {
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">예약 현황</h1>
 
-        <div className="w-full max-w-xs">
-          <Dropdown
-            trigger={
-              <div className="flex items-center justify-between w-full px-4 py-2 text-sm border rounded-lg bg-white">
-                <span>{selectedActivityTitle}</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </div>
-            }
-            options={activityOptions}
-            onSelect={handleActivitySelect}
-            align="start"
-            className="max-h-[240px] overflow-y-auto"
-          />
-        </div>
+        <ActivityDropdown
+          selectedTitle={selectedActivityTitle}
+          options={activityOptions}
+          onSelect={handleActivitySelect}
+        />
 
         <div className="p-4 bg-white rounded-lg shadow">
           <Calendar
@@ -138,70 +128,19 @@ const MyCalendarPage = () => {
                   (r) => r.date === formattedDate,
                 );
 
-                const hasReservations =
-                  reservation &&
-                  (reservation.reservations.completed > 0 ||
-                    reservation.reservations.confirmed > 0 ||
-                    reservation.reservations.pending > 0);
-
                 return (
-                  <div className="relative h-24 w-24 p-0 border-y" {...props}>
-                    <div className="absolute top-2 left-2 flex items-center gap-1">
-                      <span>{format(date, 'd')}</span>
-                      {hasReservations && (
-                        <div className="flex gap-0.5">
-                          {reservation.reservations.completed > 0 && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-bright" />
-                          )}
-                          {reservation.reservations.confirmed > 0 && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue" />
-                          )}
-                          {reservation.reservations.pending > 0 && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    {reservation && (
-                      <div className="absolute bottom-1 left-2 right-2 space-y-1">
-                        {reservation.reservations.completed > 0 && (
-                          <div className="bg-green-bright text-[10px] text-white px-2 py-0.5 rounded-sm">
-                            완료 ({reservation.reservations.completed})
-                          </div>
-                        )}
-                        {reservation.reservations.confirmed > 0 && (
-                          <div className="bg-blue text-[10px] text-white px-2 py-0.5 rounded-sm">
-                            확정 ({reservation.reservations.confirmed})
-                          </div>
-                        )}
-                        {reservation.reservations.pending > 0 && (
-                          <div className="bg-yellow text-[10px] text-white px-2 py-0.5 rounded-sm">
-                            대기 ({reservation.reservations.pending})
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <CalendarDayContent
+                    date={date}
+                    reservation={reservation?.reservations}
+                    {...props}
+                  />
                 );
               },
             }}
           />
         </div>
 
-        <div className="flex gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-bright" />
-            <span>완료된 예약</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue" />
-            <span>확정된 예약</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow" />
-            <span>대기중인 예약</span>
-          </div>
-        </div>
+        <ReservationColor />
       </div>
     </MyPageLayout>
   );
