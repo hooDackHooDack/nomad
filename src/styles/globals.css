@@ -21,6 +21,31 @@ button {
   border: 1px solid;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination li a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pagination li.active a {
+  cursor: default;
+}
+
+.pagination li.disabled a {
+  cursor: not-allowed;
+}
+
 @layer base {
   :root {
     --radius: 0.5rem;
