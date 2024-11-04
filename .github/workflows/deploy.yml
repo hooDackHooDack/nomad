@@ -1,36 +1,70 @@
-name: Vercel Production Deployment
+name: Deploy to Vercel
 on:
   push:
-    branches:
-      - main # main 브랜치에 push되거나
+    branches: ['main']
   pull_request:
-    types: [closed] # PR이 머지될 때
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
 
 env:
   VERCEL_ORG_ID: team_rU1re5ohzwZO1pnbb3h0vqaA
   VERCEL_PROJECT_ID: prj_DrJR64WhobXohBgzKQTHfOtLTUW8
 
 jobs:
-  Deploy-Production:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      # PR인 경우 프리뷰 배포
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        if: github.event_name == 'pull_request'
+
+      - name: Build Project Artifacts for Preview
+        if: github.event_name == 'pull_request'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel for Preview
+        if: github.event_name == 'pull_request'
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+
+      # main 브랜치인 경우 프로덕션 배포
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-      - name: Build Project Artifacts
+      - name: Build Project Artifacts for Production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy Project Artifacts to Vercel
+      - name: Deploy Project Artifacts to Vercel for Production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # PR 커멘트에 프리뷰 URL 추가
+      - name: Comment PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+          script: |
+            const deploymentUrl = process.env.DEPLOYMENT_URL;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✨ Preview deployment is ready! URL: ${deploymentUrl}`
+            })
