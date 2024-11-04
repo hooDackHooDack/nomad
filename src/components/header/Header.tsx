@@ -4,12 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { useAuth, logout } from '@/hooks/auth/useAuth';
 import Logo from '/public/logo/logo_row.svg';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import Dropdown, { DropdownOption } from '@/components/Dropdown';
 
 const Header = () => {
   const { user, isLoading } = useAuth();
@@ -20,6 +15,21 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const options: DropdownOption[] = [
+    { label: '마이 페이지', value: '/mypage' },
+    { label: '체험 등록', value: '/activities/create/basic' },
+    { label: '로그아웃', value: 'logout' },
+  ];
+
+  const handleSelect = (value: string | number) => {
+    if (value === 'logout') {
+      handleLogout();
+    } else if (typeof value === 'string') {
+      // 페이지 이동
+      window.location.href = value;
+    }
   };
 
   return (
@@ -34,33 +44,24 @@ const Header = () => {
             <>
               <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-900" />
               <div className="w-[1px] h-4 bg-gray-600"></div>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-3 border-none">
-                  <img
-                    src={user.profileImageUrl}
-                    alt="profile"
-                    className="size-8 rounded-full object-cover"
-                  />
-                  <span className="font-medium text-gray-600">
-                    {user.nickname}
-                  </span>
-                </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-full">
-                  <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
-                    <Link href="/mypage">마이 페이지</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center justify-center cursor-pointer">
-                    <Link href="/activities/create/basic">체험 등록</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center justify-center cursor-pointer"
-                    onClick={handleLogout}
-                  >
-                    로그아웃
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Dropdown
+                trigger={
+                  <div className="flex items-center gap-3 cursor-pointer">
+                    <img
+                      src={user.profileImageUrl}
+                      alt="profile"
+                      className="size-8 rounded-full object-cover"
+                    />
+                    <span className="font-medium text-gray-600">
+                      {user.nickname}
+                    </span>
+                  </div>
+                }
+                options={options}
+                onSelect={handleSelect}
+                align="end"
+              />
             </>
           ) : (
             <div className="flex items-center gap-2">

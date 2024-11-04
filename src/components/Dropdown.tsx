@@ -23,7 +23,7 @@ import { useState, useRef, useEffect } from 'react';
  * />
  */
 
-interface DropdownOption {
+export interface DropdownOption {
   label: string;
   value: string | number;
 }
