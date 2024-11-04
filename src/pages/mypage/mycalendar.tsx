@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import MyPageLayout from '@/components/mypage/MypageLayout';
 import { Calendar } from '@/components/ui/calendar';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import {
@@ -32,6 +32,8 @@ const MyCalendarPage = () => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const { data: activitiesResponse, isLoading } = useQuery<ActivityResponse>({
     queryKey: ['myActivities'],
@@ -156,6 +158,8 @@ const MyCalendarPage = () => {
               activityId={selectedActivity}
               isOpen={isDrawerOpen}
               onOpenChange={handleDrawerClose}
+              queryClient={queryClient}
+              currentMonth={currentMonth}
             />
           )}
         </div>
