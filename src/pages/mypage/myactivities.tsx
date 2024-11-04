@@ -11,8 +11,8 @@ const MyActivitiesPage = () => {
     queryKey: ['myActivities'],
     queryFn: fetchMyActivities,
   });
-  const activities = data?.data.activities;
-
+  const activities = data?.data?.activities ?? [];
+  
   const deleteMutation = useMutation({
     mutationFn: (activityId: number) => deleteMyActivity(activityId),
     onSuccess: () => {

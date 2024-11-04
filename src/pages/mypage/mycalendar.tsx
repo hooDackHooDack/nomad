@@ -29,25 +29,17 @@ interface Reservation {
   };
 }
 
-interface DayContent {
-  date: Date;
-  completed?: number;
-  confirmed?: number;
-  pending?: number;
-}
-
 const MyCalendarPage = () => {
   const [selectedActivity, setSelectedActivity] = useState('');
   const [selectedActivityTitle, setSelectedActivityTitle] =
     useState<string>('체험을 선택하세요');
-  const [date, setDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   // Fetch activities
   const { data: activitiesResponse, isLoading } = useQuery<ActivityResponse>({
     queryKey: ['myActivities'],
     queryFn: async () => {
       const response = await fetchMyActivities();
-      console.log('Activities Response:', response); // 데이터 구조 확인
       return response.data;
     },
   });
@@ -64,17 +56,18 @@ const MyCalendarPage = () => {
     }
   }, [activities, selectedActivity, isLoading]);
 
+  // Fetch reservations for selected activity and current month
   const { data: reservations } = useQuery<Reservation[]>({
     queryKey: [
       'reservations',
       selectedActivity,
-      date.getFullYear(),
-      date.getMonth() + 1,
+      format(currentMonth, 'yyyy'),
+      format(currentMonth, 'MM'),
     ],
     queryFn: async () => {
       if (!selectedActivity) return [];
       const response = await authApi.get(
-        `/my-activities/${selectedActivity}/reservation-dashboard?year=${date.getFullYear()}&month=${date.getMonth() + 1}`,
+        `/my-activities/${selectedActivity}/reservation-dashboard?year=${format(currentMonth, 'yyyy')}&month=${format(currentMonth, 'MM')}`,
       );
       return response.data;
     },
@@ -96,30 +89,8 @@ const MyCalendarPage = () => {
     }
   };
 
-  const DayContent = ({ completed = 0, confirmed = 0, pending = 0 }: DayContent) => {
-    if (!completed && !confirmed && !pending) return null;
-
-    return (
-      <div className="w-full h-full flex flex-col items-center">
-        <div className="text-xs mt-1">
-          {completed > 0 && (
-            <div className="bg-green-bright px-1 rounded text-white mb-0.5">
-              완료 {completed}
-            </div>
-          )}
-          {confirmed > 0 && (
-            <div className="bg-blue px-1 rounded text-white mb-0.5">
-              확정 {confirmed}
-            </div>
-          )}
-          {pending > 0 && (
-            <div className="bg-yellow px-1 rounded text-white">
-              대기 {pending}
-            </div>
-          )}
-        </div>
-      </div>
-    );
+  const handleMonthChange = (date: Date) => {
+    setCurrentMonth(date);
   };
 
   if (isLoading) {
@@ -149,23 +120,68 @@ const MyCalendarPage = () => {
         <div className="p-4 bg-white rounded-lg shadow">
           <Calendar
             mode="single"
-            selected={date}
-            onSelect={(newDate) => newDate && setDate(newDate)}
+            selected={currentMonth}
+            onSelect={(newDate) => newDate && setCurrentMonth(newDate)}
+            onMonthChange={handleMonthChange}
             locale={ko}
             className="rounded-md"
+            classNames={{
+              day_today: 'text-yellow font-bold',
+              cell: 'h-24 w-24 p-0 relative',
+              head_cell: 'h-12 w-24',
+              day: 'h-24 w-24',
+            }}
             components={{
-              DayContent: ({ date }) => {
+              Day: ({ date, ...props }) => {
+                const formattedDate = format(date, 'yyyy-MM-dd');
                 const reservation = reservations?.find(
-                  (r) => r.date === format(date, 'yyyy-MM-dd'),
+                  (r) => r.date === formattedDate,
                 );
 
+                const hasReservations =
+                  reservation &&
+                  (reservation.reservations.completed > 0 ||
+                    reservation.reservations.confirmed > 0 ||
+                    reservation.reservations.pending > 0);
+
                 return (
-                  <DayContent
-                    date={date}
-                    completed={reservation?.reservations.completed}
-                    confirmed={reservation?.reservations.confirmed}
-                    pending={reservation?.reservations.pending}
-                  />
+                  <div className="relative h-24 w-24 p-0 border-y" {...props}>
+                    <div className="absolute top-2 left-2 flex items-center gap-1">
+                      <span>{format(date, 'd')}</span>
+                      {hasReservations && (
+                        <div className="flex gap-0.5">
+                          {reservation.reservations.completed > 0 && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-bright" />
+                          )}
+                          {reservation.reservations.confirmed > 0 && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue" />
+                          )}
+                          {reservation.reservations.pending > 0 && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-yellow" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {reservation && (
+                      <div className="absolute bottom-1 left-2 right-2 space-y-1">
+                        {reservation.reservations.completed > 0 && (
+                          <div className="bg-green-bright text-[10px] text-white px-2 py-0.5 rounded-sm">
+                            완료 ({reservation.reservations.completed})
+                          </div>
+                        )}
+                        {reservation.reservations.confirmed > 0 && (
+                          <div className="bg-blue text-[10px] text-white px-2 py-0.5 rounded-sm">
+                            확정 ({reservation.reservations.confirmed})
+                          </div>
+                        )}
+                        {reservation.reservations.pending > 0 && (
+                          <div className="bg-yellow text-[10px] text-white px-2 py-0.5 rounded-sm">
+                            대기 ({reservation.reservations.pending})
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 );
               },
             }}
