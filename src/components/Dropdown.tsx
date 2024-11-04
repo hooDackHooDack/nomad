@@ -56,8 +56,8 @@ const Dropdown = ({
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSelect = (value: string | number) => {
@@ -73,43 +73,25 @@ const Dropdown = ({
 
       {isOpen && (
         <div
-          className={`absolute mt-1 rounded-lg border border-gray-200 bg-white py-1 shadow-lg ${
+          className={`absolute mt-1 rounded-lg border border-gray-200 bg-white py-1 shadow-lg min-w-[120px] w-full z-50 ${
             align === 'end'
               ? 'right-0'
               : align === 'center'
-              ? 'left-1/2 -translate-x-1/2'
-              : 'left-0'
+                ? 'left-1/2 -translate-x-1/2'
+                : 'left-0'
           } ${className}`}
         >
           {options.map((option) => (
-            <DropdownItem
+            <div
               key={option.value}
               onClick={() => handleSelect(option.value)}
+              className="px-4 py-2.5 text-sm text-gray-800 text-center hover:bg-gray-100 cursor-pointer"
             >
               {option.label}
-            </DropdownItem>
+            </div>
           ))}
         </div>
       )}
-    </div>
-  );
-};
-
-export const DropdownItem = ({
-  children,
-  onClick,
-  className = '',
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-}) => {
-  return (
-    <div
-      className={`px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer ${className}`}
-      onClick={onClick}
-    >
-      {children}
     </div>
   );
 };
