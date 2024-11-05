@@ -16,15 +16,20 @@ const REFRESH_THRESHOLD = 5 * 60; // 5분
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (error?: any) => void;
+}> = [];
 
-const onRefreshed = (token: string) => {
-  refreshSubscribers.forEach((callback) => callback(token));
-  refreshSubscribers = [];
-};
-
-const addRefreshSubscriber = (callback: (token: string) => void) => {
-  refreshSubscribers.push(callback);
+const processFailedQueue = (error: any = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
 };
 
 const validateToken = (
@@ -44,9 +49,7 @@ const validateToken = (
   }
 };
 
-const refreshAccessToken = async (
-  currentToken: string,
-): Promise<string | null> => {
+const refreshAccessToken = async (currentToken: string): Promise<string> => {
   try {
     const { data } = await basicApi.post<{ accessToken: string }>(
       '/auth/tokens',
@@ -58,17 +61,24 @@ const refreshAccessToken = async (
       },
     );
 
+    if (!data.accessToken) {
+      throw new Error('No token received');
+    }
+
     return data.accessToken;
   } catch (error) {
     console.error('토큰 갱신 실패:', error);
-    return null;
+    throw error;
   }
 };
 
 const handleUnauthorized = () => {
-  const redirectToLogin = () => {
-    window.location.href = '/auth/login';
-  };
+  Cookies.remove('accessToken'); // 만료된 토큰 제거
+
+  // 이미 로그인 페이지에 있다면 알림을 표시하지 않음
+  if (window.location.pathname.includes('/auth/login')) {
+    return;
+  }
 
   alertModal({
     title: '로그인이 필요합니다',
@@ -76,9 +86,9 @@ const handleUnauthorized = () => {
     icon: 'warning',
     confirmButtonText: '확인',
     timer: 3000,
-    confirmedFunction: redirectToLogin,
-    // willClose callback을 추가하여 모달이 닫힐 때도 리다이렉트
-    willClose: redirectToLogin,
+    confirmedFunction: () => {
+      window.location.href = '/auth/login';
+    },
   });
 };
 
@@ -95,41 +105,37 @@ authApi.interceptors.request.use(
     const accessToken = Cookies.get('accessToken');
 
     if (!accessToken) {
-      handleUnauthorized();
-      return config;
+      throw new axios.Cancel('No access token');
     }
 
     const { isValid, remainingTime } = validateToken(accessToken);
 
     if (!isValid) {
-      handleUnauthorized();
-      throw new Error('Token expired');
+      throw new axios.Cancel('Token invalid');
     }
 
-    if (remainingTime < REFRESH_THRESHOLD) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
+    try {
+      if (remainingTime < REFRESH_THRESHOLD) {
+        if (!isRefreshing) {
+          isRefreshing = true;
           const newToken = await refreshAccessToken(accessToken);
-          if (newToken) {
-            Cookies.set('accessToken', newToken);
-            onRefreshed(newToken);
-            config.headers.Authorization = `Bearer ${newToken}`;
-          } else {
-            handleUnauthorized();
-            throw new Error('Token refresh failed');
-          }
-        } finally {
+          Cookies.set('accessToken', newToken);
+          config.headers.Authorization = `Bearer ${newToken}`;
           isRefreshing = false;
+          processFailedQueue();
+        } else {
+          await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          const newToken = Cookies.get('accessToken');
+          config.headers.Authorization = `Bearer ${newToken}`;
         }
       } else {
-        const newToken = await new Promise<string>((resolve) => {
-          addRefreshSubscriber(resolve);
-        });
-        config.headers.Authorization = `Bearer ${newToken}`;
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
-    } else {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    } catch (error) {
+      processFailedQueue(error);
+      throw error;
     }
 
     return config;
@@ -142,12 +148,32 @@ authApi.interceptors.request.use(
 authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (
-      error.response?.status === 401 &&
-      error.response?.data?.message === 'Unauthorized'
-    ) {
+    const originalRequest = error.config;
+
+    // 토큰 관련 에러 처리
+    if (error.response?.status === 401) {
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
+        const accessToken = Cookies.get('accessToken');
+
+        if (!accessToken) {
+          handleUnauthorized();
+          return Promise.reject(error);
+        }
+
+        try {
+          const newToken = await refreshAccessToken(accessToken);
+          Cookies.set('accessToken', newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return authApi(originalRequest);
+        } catch (refreshError) {
+          handleUnauthorized();
+          return Promise.reject(refreshError);
+        }
+      }
       handleUnauthorized();
     }
+
     return Promise.reject(error);
   },
 );
