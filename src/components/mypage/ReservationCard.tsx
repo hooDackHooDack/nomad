@@ -2,7 +2,6 @@
 import { useForm } from 'react-hook-form';
 import { Reservation } from '@/types/mypage/reservations';
 import { cn } from '../ui/cn';
-import { RESERVATION_STATUS } from '@/pages/mypage/reservations';
 import {
   Dialog,
   DialogContent,
@@ -11,14 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Star } from 'lucide-react';
-
-const STATUS_STYLES = {
-  pending: 'text',
-  confirmed: 'text-blue',
-  declined: 'text-red',
-  canceled: 'text-gray-400',
-  completed: 'text-green-bright',
-};
+import { RESERVATION_STATUS, STATUS_STYLES } from './reservationConstants';
 
 type ReviewFormValues = {
   rating: number;
