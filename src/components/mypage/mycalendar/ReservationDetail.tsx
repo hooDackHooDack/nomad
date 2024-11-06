@@ -8,15 +8,17 @@ import {
 } from '@/components/ui/drawer';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
-import authApi from '@/lib/axios/auth';
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import Dropdown from '@/components/Dropdown';
 import { ChevronDown } from 'lucide-react';
 import { alertModal } from '@/utils/alert/alertModal';
+import {
+  fetchReservationsBySchedule,
+  fetchReservedSchedule,
+  updateReservationStatus,
+} from '@/lib/api/myReservation';
+import ReservationStatusTabs from './ReservationStatus';
+import ReservationCard from './ReservationCard';
 
 interface ReservedSchedule {
   scheduleId: number;
@@ -68,7 +70,7 @@ const ReservationDetail = ({
   >('pending');
 
   // 예약 상태 변경 mutation
-  const updateReservationStatus = useMutation({
+  const updateReservationStatusMutation = useMutation({
     mutationFn: async ({
       reservationId,
       status,
@@ -76,11 +78,7 @@ const ReservationDetail = ({
       reservationId: number;
       status: 'confirmed' | 'declined';
     }) => {
-      const response = await authApi.patch(
-        `/my-activities/${activityId}/reservations/${reservationId}`,
-        { status },
-      );
-      return response.data;
+      return updateReservationStatus({ reservationId, activityId, status });
     },
     onSuccess: () => {
       // 예약 상세 목록 갱신
@@ -121,7 +119,7 @@ const ReservationDetail = ({
 
   // 예약 승인 핸들러
   const handleConfirm = async (reservationId: number) => {
-    updateReservationStatus.mutate({
+    updateReservationStatusMutation.mutate({
       reservationId,
       status: 'confirmed',
     });
@@ -129,7 +127,7 @@ const ReservationDetail = ({
 
   // 예약 거절 핸들러
   const handleDecline = async (reservationId: number) => {
-    updateReservationStatus.mutate({
+    updateReservationStatusMutation.mutate({
       reservationId,
       status: 'declined',
     });
@@ -137,24 +135,19 @@ const ReservationDetail = ({
 
   const { data: schedules } = useQuery<ReservedSchedule[]>({
     queryKey: ['reservedSchedule', activityId, format(date, 'yyyy-MM-dd')],
-    queryFn: async () => {
-      const response = await authApi.get(
-        `/my-activities/${activityId}/reserved-schedule?date=${format(date, 'yyyy-MM-dd')}`,
-      );
-      return response.data;
-    },
+    queryFn: () => fetchReservedSchedule(activityId, date),
     enabled: !!activityId && isOpen,
   });
 
   const { data: reservations, isLoading: isLoadingReservations } =
     useQuery<ReservationResponse>({
       queryKey: ['reservations', activityId, selectedScheduleId, activeStatus],
-      queryFn: async () => {
-        const response = await authApi.get(
-          `/my-activities/${activityId}/reservations?size=10&scheduleId=${selectedScheduleId}&status=${activeStatus}`,
-        );
-        return response.data;
-      },
+      queryFn: () =>
+        fetchReservationsBySchedule(
+          activityId,
+          selectedScheduleId as number,
+          activeStatus,
+        ),
       enabled: !!activityId && !!selectedScheduleId,
     });
 
@@ -209,42 +202,12 @@ const ReservationDetail = ({
             {selectedSchedule && (
               <div className="space-y-4 min-h-56">
                 <h3 className="text-lg font-semibold">예약 내역</h3>
+                <ReservationStatusTabs
+                  activeStatus={activeStatus}
+                  counts={selectedSchedule.count}
+                  onChangeStatus={setActiveStatus}
+                />
 
-                {/* 상태 탭 */}
-                <div className="flex border-b border-gray-200">
-                  <button
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-                      activeStatus === 'pending'
-                        ? 'border-yellow text-yellow'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                    onClick={() => setActiveStatus('pending')}
-                  >
-                    신청 {selectedSchedule.count.pending}
-                  </button>
-                  <button
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-                      activeStatus === 'confirmed'
-                        ? 'border-blue text-blue'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                    onClick={() => setActiveStatus('confirmed')}
-                  >
-                    승인 {selectedSchedule.count.confirmed}
-                  </button>
-                  <button
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-                      activeStatus === 'declined'
-                        ? 'border-red text-red'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                    onClick={() => setActiveStatus('declined')}
-                  >
-                    거절 {selectedSchedule.count.declined}
-                  </button>
-                </div>
-
-                {/* 예약 카드 목록 */}
                 <div className="space-y-3">
                   {isLoadingReservations ? (
                     <div className="text-center py-8">로딩중...</div>
@@ -253,51 +216,16 @@ const ReservationDetail = ({
                       예약 내역이 없습니다
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {reservations?.reservations.map((reservation) => (
-                        <div
-                          key={reservation.id}
-                          className="p-4 border rounded-lg bg-white"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="space-y-1">
-                              <p className="font-medium">
-                                닉네임: {reservation.nickname}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                예약 인원: {reservation.headCount}명
-                              </p>
-                            </div>
-                            {activeStatus === 'pending' && (
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleConfirm(reservation.id)}
-                                  disabled={updateReservationStatus.isPending}
-                                  className="px-4 py-2 bg-green-dark text-white rounded-lg 
-                                    hover:opacity-90 text-sm disabled:opacity-50 
-                                    disabled:cursor-not-allowed"
-                                >
-                                  {updateReservationStatus.isPending
-                                    ? '처리중...'
-                                    : '승인하기'}
-                                </button>
-                                <button
-                                  onClick={() => handleDecline(reservation.id)}
-                                  disabled={updateReservationStatus.isPending}
-                                  className="px-4 py-2 border border-gray-300 rounded-lg 
-                                    hover:border-gray-400 text-sm disabled:opacity-50 
-                                    disabled:cursor-not-allowed"
-                                >
-                                  {updateReservationStatus.isPending
-                                    ? '처리중...'
-                                    : '거절하기'}
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    reservations?.reservations.map((reservation) => (
+                      <ReservationCard
+                        key={reservation.id}
+                        reservation={reservation}
+                        activeStatus={activeStatus}
+                        onConfirm={handleConfirm}
+                        onDecline={handleDecline}
+                        isProcessing={updateReservationStatusMutation.isPending}
+                      />
+                    ))
                   )}
                 </div>
               </div>
