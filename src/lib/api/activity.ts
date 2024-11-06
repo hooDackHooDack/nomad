@@ -116,3 +116,25 @@ export const getReview = async (
     },
   });
 };
+
+export interface Reservation {
+  date: string;
+  reservations: {
+    completed: number;
+    confirmed: number;
+    pending: number;
+  };
+}
+
+export const fetchMyActivitiesByDate = async (
+  activityId: string,
+  year: string,
+  month: string
+) => {
+  return authApi.get<Reservation[]>(`/my-activities/${activityId}/reservation-dashboard`, {
+    params: {
+      year,
+      month,
+    },
+  });
+};

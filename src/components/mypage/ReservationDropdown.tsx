@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
-import { RESERVATION_STATUS } from '@/pages/mypage/reservations';
 import Dropdown from '@/components/Dropdown';
+import { RESERVATION_STATUS } from './reservationConstants';
 
 interface StatusDropdownProps {
   value: string;
