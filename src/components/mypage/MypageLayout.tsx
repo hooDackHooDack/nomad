@@ -134,7 +134,7 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-164px)] bg-gray-50 py-8">
+    <div className="min-h-[calc(100vh-144px)] bg-gray-50 py-8">
       <div
         className="mx-auto px-4 
         sm:max-w-[743px] 
