@@ -141,7 +141,7 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
         md:max-w-[1919px] md:px-6 
         lg:max-w-[1920px] lg:px-8"
       >
-        <div className="flex justify-between items-center mb-6 md:hidden lg:hidden">
+        <div className="flex justify-between items-center mb-6 md:hidden">
           <MobileNav currentPath={currentPath} />
           <h1 className="text-2xl font-bold">
             {navigationItems.find((item) => item.path === currentPath)?.title}
@@ -152,14 +152,13 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
         <div
           className="grid grid-cols-1 gap-8 
           sm:grid-cols-1
-          md:grid-cols-12
-          lg:grid-cols-12"
+          md:grid-cols-12"
         >
-          <div className="hidden lg:block lg:col-span-3 md:block md:col-span-3">
+          <div className="hidden md:block md:col-span-3">
             <SideNav currentPath={currentPath} />
           </div>
-          <div className="md:col-span-9 lg:col-span-9">
-            <div className="p-6">{children}</div>
+          <div className="md:col-span-9">
+            <div className="p-6 sm:p-2">{children}</div>
           </div>
         </div>
       </div>

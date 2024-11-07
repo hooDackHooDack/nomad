@@ -127,12 +127,15 @@ const MyCalendarPage = () => {
             onSelect={(newDate) => newDate && handleDateClick(newDate)}
             onMonthChange={handleMonthChange}
             locale={ko}
-            className="rounded-md"
+            className="rounded-md w-full"
             classNames={{
               day_today: 'text-yellow font-bold',
-              cell: 'h-24 w-24 p-0 relative',
-              head_cell: 'h-12 w-24',
-              day: 'h-24 w-24',
+              cell: 'h-16 w-full sm:h-16 sm:w-full md:h-16 md:w-16 lg:h-20 lg:w-20 p-0 relative',
+              head_cell: 'h-8 sm:h-10 md:h-10 w-full md:w-16 lg:w-20',
+              day: 'h-16 w-full sm:h-16 sm:w-full md:h-16 md:w-16 lg:h-20 lg:w-20',
+              months: 'w-full',
+              month: 'w-full',
+              table: 'w-full',
             }}
             components={{
               Day: ({ date, ...props }) => {
