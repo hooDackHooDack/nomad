@@ -58,7 +58,7 @@ const MyActivitiesPage = () => {
 
   return (
     <MyPageLayout>
-      <h1 className="text-3xl font-bold mb-6">내 체험 관리</h1>
+      <h1 className="text-3xl font-bold mb-6 sm:hidden">내 체험 관리</h1>
       <div className="space-y-4">
         {activities.length > 0 ? (
           activities.map((activity) => (

@@ -112,7 +112,7 @@ const MyCalendarPage = () => {
   return (
     <MyPageLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">예약 현황</h1>
+        <h1 className="text-3xl font-bold sm:hidden">예약 현황</h1>
 
         <ActivityDropdown
           selectedTitle={selectedActivityTitle}

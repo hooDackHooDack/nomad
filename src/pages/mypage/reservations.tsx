@@ -118,9 +118,8 @@ const ReservationsPage = () => {
 
   return (
     <MyPageLayout>
-      <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">예약 내역</h1>
+          <h1 className="text-3xl font-bold sm:hidden">예약 내역</h1>
           <StatusDropdown value={status} onChange={setStatus} />
         </div>
 
@@ -134,7 +133,6 @@ const ReservationsPage = () => {
             />
           ))}
         </div>
-      </div>
     </MyPageLayout>
   );
 };

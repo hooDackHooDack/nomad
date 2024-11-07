@@ -100,8 +100,8 @@ const MyInfoPage = () => {
 
   return (
     <MyPageLayout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-8">
+      <div className="">
+        <div className="hidden lg:flex md:flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">내 정보</h1>
           <button
             type="submit"
@@ -143,7 +143,8 @@ const MyInfoPage = () => {
               />
             </div>
           </div>
-          <div className="space-y-6 p-6">
+
+          <div className="space-y-6">
             <FormInput<ProfileFormData>
               label="닉네임"
               name="nickname"
@@ -194,6 +195,17 @@ const MyInfoPage = () => {
                   value === watchNewPassword || '비밀번호가 일치하지 않습니다.',
               }}
             />
+          </div>
+
+          <div className="lg:hidden md:hidden mt-8">
+            <button
+              type="submit"
+              className="w-full bg-green-dark text-white py-3 rounded-lg hover:bg-green-darker transition-colors"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isUpdateLoading}
+            >
+              저장하기
+            </button>
           </div>
         </form>
       </div>
