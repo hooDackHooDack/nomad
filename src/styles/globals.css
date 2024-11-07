@@ -46,6 +46,108 @@ button {
   cursor: not-allowed;
 }
 
+.quill-content {
+  /* 기본 텍스트 스타일 */
+  font-size: 16px;
+  line-height: 1.6;
+
+  /* 헤더 스타일 */
+  & h1 {
+    font-size: 2em;
+    font-weight: 600;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #112211; /* black-nomad 색상 */
+  }
+
+  & h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 0.83em;
+    margin-bottom: 0.5em;
+    color: #112211;
+  }
+
+  & h3 {
+    font-size: 1.17em;
+    font-weight: 600;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #112211;
+  }
+
+  /* 굵은 텍스트 */
+  & strong {
+    font-weight: 600;
+    color: #112211;
+  }
+
+  /* 리스트 스타일 */
+  & ul,
+  & ol {
+    padding-left: 2em;
+    margin: 0.5em 0;
+  }
+
+  & ul {
+    list-style-type: disc;
+  }
+
+  & ol {
+    list-style-type: decimal;
+  }
+
+  /* 리스트 아이템 */
+  & li {
+    margin: 0.25em 0;
+  }
+
+  /* 단락 */
+  & p {
+    margin: 1em 0;
+  }
+
+  /* 링크 */
+  & a {
+    color: #0065ff; /* blue-DEFAULT 색상 */
+    text-decoration: underline;
+  }
+
+  /* 인용구 */
+  & blockquote {
+    border-left: 4px solid #dddddd;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #4b494b; /* gray-800 색상 */
+  }
+
+  /* 코드 블록 */
+  & pre {
+    background-color: #fafafa; /* gray-50 색상 */
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  /* 인라인 코드 */
+  & code {
+    background-color: #fafafa;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  /* 구분선 */
+  & hr {
+    border: 0;
+    border-top: 1px solid #dddddd; /* gray-200 색상 */
+    margin: 1em 0;
+  }
+
+  /* 줄바꿈 유지 */
+  white-space: pre-line;
+}
+
 @layer base {
   :root {
     --radius: 0.5rem;
