@@ -178,7 +178,7 @@ const ImageUploadStep = () => {
                   <img
                     src={subImageUrls[index]}
                     alt={`Sub image ${index + 1}`}
-                    className="w-full h-72 object-cover rounded-lg"
+                    className="w-full h-72 sm:h-40 object-cover rounded-lg"
                   />
                   <button
                     type="button"
@@ -192,9 +192,9 @@ const ImageUploadStep = () => {
                   </button>
                 </div>
               ) : (
-                <div className="w-full h-72 flex flex-col justify-center items-center border-2 border-dashed border-gray-300 rounded-lg p-12 cursor-pointer hover:border-gray-400 transition-colors">
-                  <PlusIcon className="w-12 h-12 text-gray-400" />
-                  <span className="mt-4 text-sm text-gray-500">
+                <div className="w-full h-72 sm:h-40 flex flex-col justify-center items-center border-2 border-dashed border-gray-300 rounded-lg p-12 sm:p-4 cursor-pointer hover:border-gray-400 transition-colors">
+                  <PlusIcon className="w-12 h-12 sm:w-8 sm:h-8 text-gray-400" />
+                  <span className="mt-4 sm:mt-2 text-sm text-gray-500">
                     이미지 등록
                   </span>
                 </div>

@@ -346,8 +346,71 @@ const ActivityCreateLayout = ({
       <form onSubmit={methods.handleSubmit(handleFormSubmit)}>
         <div className="min-h-screen bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* 모바일 상단 스텝 네비게이션 */}
+            <nav className="sm:flex sm:items-center sm:justify-center sm:gap-2 sm:mb-6 md:hidden lg:hidden relative">
+              {steps.map((step, index) => {
+                const status = getStepStatus(step.id);
+                const isLast = index === steps.length - 1;
+
+                return (
+                  <div key={step.id} className="flex items-center">
+                    <Link
+                      href={`/activities/${mode}/${step.path}${
+                        mode === 'edit' ? `?id=${activityId}` : ''
+                      }`}
+                      className="relative"
+                    >
+                      <div
+                        className={`
+                        rounded-full p-1
+                        ${
+                          status === 'current'
+                            ? 'border-2 border-green-dark'
+                            : 'border-none'
+                        }
+                      `}
+                      >
+                        <Image
+                          src={step.image}
+                          alt={step.title}
+                          width={28}
+                          height={28}
+                          className={
+                            status === 'completed'
+                              ? 'text-blue-DEFAULT'
+                              : status === 'current'
+                                ? 'text-yellow-DEFAULT'
+                                : 'text-gray-400'
+                          }
+                        />
+                      </div>
+                      {status === 'completed' && (
+                        <div className="absolute -bottom-1 -right-1">
+                          <Image
+                            src="/images/number/check.png"
+                            alt="완료"
+                            width={12}
+                            height={12}
+                          />
+                        </div>
+                      )}
+                    </Link>
+
+                    {/* 연결 점들 */}
+                    {!isLast && (
+                      <div className="flex items-center mx-1">
+                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
+
             <div className="grid grid-cols-12 gap-8">
-              <div className="col-span-3">
+              {/* 데스크톱 사이드 네비게이션 */}
+              <div className="col-span-3 sm:hidden">
                 <nav className="flex flex-col gap-2">
                   {steps.map((step) => {
                     const status = getStepStatus(step.id);
@@ -361,7 +424,9 @@ const ActivityCreateLayout = ({
                     return (
                       <Link
                         key={step.id}
-                        href={`/activities/${mode}/${step.path}${mode === 'edit' ? `?id=${activityId}` : ''}`}
+                        href={`/activities/${mode}/${step.path}${
+                          mode === 'edit' ? `?id=${activityId}` : ''
+                        }`}
                         className={getStepStyles(status)}
                       >
                         <span className="mr-3">
@@ -381,18 +446,6 @@ const ActivityCreateLayout = ({
                               alt="완료"
                               width={16}
                               height={16}
-                              className="text-blue-DEFAULT"
-                            />
-                          </span>
-                        )}
-                        {status === 'current' && (
-                          <span className="ml-3">
-                            <Image
-                              src="/images/number/pin.png"
-                              alt="작성중"
-                              width={16}
-                              height={16}
-                              className="text-yellow-DEFAULT"
                             />
                           </span>
                         )}
@@ -423,8 +476,35 @@ const ActivityCreateLayout = ({
                 </div>
               </div>
 
-              <div className="col-span-9">
-                <div className="bg-white shadow rounded-lg p-6">{children}</div>
+              {/* 모바일 버튼 */}
+              <div className="sm:fixed sm:bottom-0 sm:left-0 sm:right-0 sm:p-4 sm:bg-white sm:shadow-lg sm:z-10 md:hidden lg:hidden">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleTempSave}
+                    className="flex-1 h-12 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md border-none transition-colors"
+                  >
+                    임시저장
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isFormValid()}
+                    className={`flex-1 h-12 rounded-md text-gray-50 transition-colors ${
+                      isFormValid()
+                        ? 'bg-green-dark hover:bg-green-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    등록하기
+                  </button>
+                </div>
+              </div>
+
+              {/* 컨텐츠 영역 */}
+              <div className="col-span-9 sm:col-span-12 sm:mb-20">
+                <div className="bg-white shadow rounded-lg p-6 sm:p-4 sm:shadow-none">
+                  {children}
+                </div>
               </div>
             </div>
           </div>

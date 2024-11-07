@@ -78,7 +78,7 @@ const ScheduleStep = () => {
               <TimeInput
                 value={tempStartTime}
                 onClick={() => setIsStartTimePickerOpen(true)}
-                placeholder="시작 시간 선택"
+                placeholder="Start-Time"
                 label="시작 시간"
               />
               {isStartTimePickerOpen && (
@@ -95,7 +95,7 @@ const ScheduleStep = () => {
               <TimeInput
                 value={tempEndTime}
                 onClick={() => setIsEndTimePickerOpen(true)}
-                placeholder="종료 시간 선택"
+                placeholder="End-time"
                 label="종료 시간"
               />
               {isEndTimePickerOpen && (
