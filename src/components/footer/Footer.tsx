@@ -26,15 +26,16 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full h-[92px] bg-green-dark pt-8 pb-4">
+    <footer className="w-full h-[92px] sm:h-[72px] bg-green-dark pt-8 sm:pt-4 pb-4">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
-        <span className="text-white">
+        <span className="text-white text-sm sm:text-xs">
           &copy; clyde&ddol9 - {new Date().getFullYear()}
         </span>
-        <div className="text-white flex gap-2">
+
+        <div className="text-white flex gap-2 sm:gap-1 text-sm sm:text-xs">
           <Link
             href="https://github.com/hooDackHooDack/nomad"
-            className=" hover:underline"
+            className="hover:underline"
           >
             Privacy Policy
           </Link>
@@ -58,7 +59,7 @@ const Footer = () => {
               <Image
                 src={social.icon}
                 alt={social.name}
-                className="w-6 h-6"
+                className="w-6 h-6 sm:w-4 sm:h-4"
                 width={24}
                 height={24}
               />
