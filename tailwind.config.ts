@@ -16,7 +16,6 @@ const config: Config = {
       },
       md: {
         min: '744px',
-        max: '1919px',
       },
       lg: {
         min: '1920px',
