@@ -13,7 +13,7 @@ const ActivityDropdown = ({
   onSelect,
 }: ActivityDropdownProps) => {
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-full">
       <Dropdown
         trigger={
           <div className="flex items-center justify-between w-full px-4 py-2 text-sm border rounded-lg bg-white">
@@ -25,6 +25,7 @@ const ActivityDropdown = ({
         onSelect={onSelect}
         align="start"
         className="max-h-[240px] overflow-y-auto"
+        textAlign="left"
       />
     </div>
   );

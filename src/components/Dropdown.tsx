@@ -34,6 +34,7 @@ interface DropdownProps {
   onSelect: (value: string | number) => void;
   align?: 'start' | 'end' | 'center';
   className?: string;
+  textAlign?: 'left' | 'center' | 'right';
 }
 
 const Dropdown = ({
@@ -42,6 +43,7 @@ const Dropdown = ({
   onSelect,
   align = 'end',
   className = '',
+  textAlign = 'center',
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -65,6 +67,12 @@ const Dropdown = ({
     setIsOpen(false);
   };
 
+  const textAlignClass = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right',
+  }[textAlign];
+
   return (
     <div className="relative" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
@@ -85,7 +93,7 @@ const Dropdown = ({
             <div
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              className="px-4 py-2.5 text-sm text-gray-800 text-center hover:bg-gray-100 cursor-pointer"
+              className={`px-4 py-2.5 text-sm text-gray-800 hover:bg-gray-100 cursor-pointer ${textAlignClass}`}
             >
               {option.label}
             </div>

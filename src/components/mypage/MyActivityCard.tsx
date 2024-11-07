@@ -17,15 +17,15 @@ const MyActivityCard = ({ activity, onDelete }) => {
   };
 
   return (
-    <div className="flex bg-white rounded-lg shadow-md h-36">
-      <div className="size-36 flex-shrink-0">
+    <div className="flex bg-white rounded-lg shadow-md h-36 sm:h-28">
+      <div className="size-36 flex-shrink-0 sm:size-28">
         <img
           src={activity.bannerImageUrl}
           alt="Activity Image"
           className="w-full h-full object-cover rounded-l-lg"
         />
       </div>
-      <div className="flex-1 p-4 flex flex-col justify-between">
+      <div className="flex-1 p-4 sm:p-2 flex flex-col justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-1">
             <Star size={16} className="text-yellow fill-yellow" />
