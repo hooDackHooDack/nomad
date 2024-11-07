@@ -8,6 +8,7 @@ import LocationIcon from '/public/icons/button/Location.svg';
 import Image from 'next/image';
 import ActivityReservation from '@/components/booking/ActivityReservation';
 import { ReviewSection } from '@/components/review/ReviewSection';
+import QuillContentRenderer from '@/components/react-quill/QuillContentRenderer';
 
 const fetchActivityDetail = async (activityId: string) => {
   const { data } = await basicApi.get<Activity>(`activities/${activityId}`);
@@ -120,9 +121,9 @@ const ActivityDetailPage = () => {
               <div className="w-full h-[1px] bg-[#112211] opacity-25 mb-8" />
               {/* 설명 */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">프로그램 설명</h2>
+                {/* <h2 className="text-xl font-semibold mb-4">프로그램 설명</h2> */}
                 <p className="text-gray-700 whitespace-pre-line">
-                  {activity.description}
+                  <QuillContentRenderer content={activity.description} />
                 </p>
               </div>
               <div className="w-full h-[1px] bg-[#112211] opacity-25 mb-8" />
