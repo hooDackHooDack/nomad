@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { useAuth, logout } from '@/hooks/auth/useAuth';
@@ -27,7 +27,6 @@ const Header = () => {
     if (value === 'logout') {
       handleLogout();
     } else if (typeof value === 'string') {
-      // 페이지 이동
       window.location.href = value;
     }
   };
@@ -43,17 +42,25 @@ const Header = () => {
           {user ? (
             <>
               <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-900" />
-              <div className="w-[1px] h-4 bg-gray-600"></div>
+              <div className="w-[1px] h-4 bg-gray-600 sm:hidden"></div>
 
               <Dropdown
                 trigger={
                   <div className="flex items-center gap-3 cursor-pointer">
-                    <img
-                      src={user.profileImageUrl}
-                      alt="profile"
-                      className="size-8 rounded-full object-cover"
-                    />
-                    <span className="font-medium text-gray-600">
+                    {user.profileImageUrl ? (
+                      <Image
+                        src={user.profileImageUrl}
+                        alt="profile"
+                        width={32}
+                        height={32}
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="size-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">?</span>
+                      </div>
+                    )}
+                    <span className="font-medium text-gray-600 sm:hidden">
                       {user.nickname}
                     </span>
                   </div>

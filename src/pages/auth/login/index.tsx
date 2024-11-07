@@ -26,7 +26,7 @@ const Index = () => {
     });
   };
   return (
-    <div className="flex justify-center items-center mt-40 p-5 sm:mt-8">
+    <div className="flex justify-center items-center p-5 h-screen">
       {/* 모바일 버전 전환 버튼 */}
       <div className="sm:block hidden fixed top-3 right-5 z-[200]">
         <button
