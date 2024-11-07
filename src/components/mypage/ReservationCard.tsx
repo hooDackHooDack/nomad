@@ -56,14 +56,14 @@ export default function ReservationCard({
 
   return (
     <div className="flex bg-white rounded-lg shadow-md">
-      <div className="size-36 flex-shrink-0">
+      <div className="size-36 sm:size-28 m-auto flex-shrink-0">
         <img
           src={reservation.activity.bannerImageUrl}
           alt="Activity Image"
           className="w-full h-full object-cover rounded-l-lg"
         />
       </div>
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 sm:p-2">
         <span
           className={cn(
             'text-xs font-semibold mr-2',
@@ -77,14 +77,14 @@ export default function ReservationCard({
           {reservation.date} · {reservation.startTime} - {reservation.endTime} ·{' '}
           {reservation.headCount}명
         </p>
-        <div className="flex justify-between items-center">
-          <p className="font-bold mt-2">
+        <div className="flex justify-between items-center mt-2">
+          <p className="font-bold">
             ₩ {reservation.totalPrice.toLocaleString()}
           </p>
           {isCancelable && (
             <button
               onClick={() => onCancel && onCancel(reservation.id)}
-              className="border border-green-dark px-4 py-1 rounded-lg"
+              className="border border-green-dark px-4 py-1 rounded-lg sm:text-sm sm:px-2 sm:py-0"
             >
               예약 취소
             </button>
@@ -94,14 +94,14 @@ export default function ReservationCard({
               {reservation.reviewSubmitted ? (
                 <button
                   disabled
-                  className="bg-gray-400 text-white px-4 py-1 rounded-lg cursor-not-allowed"
+                  className="bg-gray-400 text-white px-4 py-1 rounded-lg cursor-not-allowed sm:text-sm sm:px-2 sm:py-0"
                 >
                   작성 완료
                 </button>
               ) : (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <button className="bg-green-dark border border-green-dark text-white px-4 py-1 rounded-lg">
+                    <button className="bg-green-dark border border-green-dark text-white px-4 py-1 rounded-lg sm:text-sm sm:px-2 sm:py-0">
                       후기 작성
                     </button>
                   </DialogTrigger>
