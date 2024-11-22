@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import {ko} from "date-fns/locale";
+import { ko } from 'date-fns/locale';
 import { Notification } from '@/types/notification/notification';
 
 interface NotificationItemProps {

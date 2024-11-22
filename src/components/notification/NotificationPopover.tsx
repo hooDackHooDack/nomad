@@ -3,14 +3,14 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 import { NotificationList } from './NotificationList';
 import { useNotifications } from '@/hooks/notification/useNotifications';
 
 export const NotificationPopover = () => {
-  const { 
-    notifications, 
-    isLoading, 
+  const {
+    notifications,
+    isLoading,
     totalCount,
     isOpen,
     togglePopover,

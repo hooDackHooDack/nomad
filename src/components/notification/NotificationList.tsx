@@ -60,7 +60,7 @@ export const NotificationList = ({
         </div>
       ))}
       {isFetchingNextPage && (
-        <div className="p-4 text-center text-gray-500">로딩중...</div>
+        <div className="p-4 text-center text-gray-500">더 불러오는 중...</div>
       )}
     </div>
   );
