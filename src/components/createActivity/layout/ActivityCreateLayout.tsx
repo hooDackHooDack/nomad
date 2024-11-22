@@ -10,6 +10,7 @@ import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
 import { useActivityDraft } from '@/hooks/activity/useActivityDraft';
 import { MobileStepNavigation } from '@/components/createActivity/navigation/MobileStepNav';
 import { DesktopStepNavigation } from '@/components/createActivity/navigation/DesktopStepNav';
+import { ACTIVITY_ALERT_MESSAGES } from '@/components/constants/alert/activityCreate';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -61,10 +62,7 @@ const ActivityCreateLayout = ({
       if (mode === 'edit' && activityId) {
         await updateActivity(activityId, data, formDiff);
         alertModal({
-          icon: 'success',
-          title: '액티비티가 성공적으로 수정되었습니다.',
-          text: '액티비티 상세 페이지로 이동합니다.',
-          confirmButtonText: '확인',
+          ...ACTIVITY_ALERT_MESSAGES.EDIT.SUCCESS,
           confirmedFunction: () => {
             router.push(`/activities/${activityId}`);
           },
@@ -73,10 +71,7 @@ const ActivityCreateLayout = ({
         const response = await createActivity(data);
         console.log('Activity created:', response);
         alertModal({
-          icon: 'success',
-          title: '액티비티가 성공적으로 등록되었습니다.',
-          text: '액티비티 목록 페이지로 이동합니다.',
-          confirmButtonText: '확인',
+          ...ACTIVITY_ALERT_MESSAGES.CREATE.SUCCESS,
           confirmedFunction: () => {
             router.push('/activities');
           },
@@ -86,12 +81,11 @@ const ActivityCreateLayout = ({
       cleanupDraftData();
     } catch (error) {
       console.error('Form submit error:', error);
-      alertModal({
-        icon: 'error',
-        title: `액티비티 ${mode === 'edit' ? '수정' : '등록'} 실패`,
-        text: `액티비티 ${mode === 'edit' ? '수정' : '등록'} 중 오류가 발생했습니다.`,
-        confirmButtonText: '확인',
-      });
+      alertModal(
+        mode === 'edit'
+          ? ACTIVITY_ALERT_MESSAGES.EDIT.ERROR
+          : ACTIVITY_ALERT_MESSAGES.CREATE.ERROR,
+      );
     }
   };
 
