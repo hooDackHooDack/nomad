@@ -34,4 +34,34 @@ export const RESERVATION_ALERT_MESSAGES = {
       timer: 2000,
     }),
   },
+  CANCEL: {
+    CONFIRM: createReservationAlert({
+      title: '예약 취소',
+      text: '정말로 예약을 취소하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }),
+    SUCCESS: createReservationAlert({
+      title: '예약 취소 성공',
+      text: '예약이 취소되었습니다.',
+      icon: 'success',
+    }),
+    ERROR: createReservationAlert({
+      title: '예약 취소 실패',
+      icon: 'error',
+    }),
+  },
+  REVIEW: {
+    SUCCESS: createReservationAlert({
+      title: '리뷰 등록 성공',
+      text: '리뷰가 등록되었습니다.',
+      icon: 'success',
+    }),
+    ERROR: createReservationAlert({
+      title: '리뷰 등록 실패',
+      icon: 'error',
+    }),
+  },
 } as const;

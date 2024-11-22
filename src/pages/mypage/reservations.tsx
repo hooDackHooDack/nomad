@@ -15,6 +15,7 @@ import {
   fetchReservations,
   postReview,
 } from '@/lib/api/reservation';
+import { RESERVATION_ALERT_MESSAGES } from '@/components/constants/alert/reservation';
 
 const ReservationsPage = () => {
   const [status, setStatus] = useState('');
@@ -33,22 +34,15 @@ const ReservationsPage = () => {
     mutationFn: (reservationId: number) => cancelReservation(reservationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reservations', status] });
-      alertModal({
-        title: '예약 취소 성공',
-        text: '예약이 취소되었습니다.',
-        icon: 'success',
-        showCancelButton: false,
-        confirmButtonText: '확인',
-      });
+      alertModal(RESERVATION_ALERT_MESSAGES.CANCEL.SUCCESS);
     },
     onError: (error: any) => {
       alertModal({
-        title: '예약 취소 실패',
-        text: error.message,
-        icon: 'error',
+        ...RESERVATION_ALERT_MESSAGES.CANCEL.ERROR,
         showCancelButton: false,
         confirmButtonText: '확인',
       });
+      console.log(error);
     },
   });
 
@@ -64,22 +58,13 @@ const ReservationsPage = () => {
     }) => postReview(reservationId, { rating, content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reservations', status] });
-      alertModal({
-        title: '리뷰 등록 성공',
-        text: '리뷰가 등록되었습니다.',
-        icon: 'success',
-        showCancelButton: false,
-        confirmButtonText: '확인',
-      });
+      alertModal(RESERVATION_ALERT_MESSAGES.REVIEW.SUCCESS);
     },
     onError: (error: any) => {
       console.error('Failed to submit review:', error);
       alertModal({
-        title: '리뷰 등록 실패',
+        ...RESERVATION_ALERT_MESSAGES.REVIEW.ERROR,
         text: error.message,
-        icon: 'error',
-        showCancelButton: false,
-        confirmButtonText: '확인',
       });
     },
   });
@@ -94,12 +79,7 @@ const ReservationsPage = () => {
 
   const handleCancel = (reservationId: number) => {
     alertModal({
-      title: '예약 취소',
-      text: '정말로 예약을 취소하시겠습니까?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: '확인',
-      cancelButtonText: '취소',
+      ...RESERVATION_ALERT_MESSAGES.CANCEL.CONFIRM,
       confirmedFunction: () => cancelMutation.mutate(reservationId),
     });
   };
@@ -118,21 +98,21 @@ const ReservationsPage = () => {
 
   return (
     <MyPageLayout>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold sm:hidden">예약 내역</h1>
-          <StatusDropdown value={status} onChange={setStatus} />
-        </div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold sm:hidden">예약 내역</h1>
+        <StatusDropdown value={status} onChange={setStatus} />
+      </div>
 
-        <div className="space-y-4">
-          {data?.reservations.map((reservation) => (
-            <ReservationCard
-              key={reservation.id}
-              reservation={reservation}
-              onCancel={handleCancel}
-              onSubmitReview={handleSubmitReview}
-            />
-          ))}
-        </div>
+      <div className="space-y-4">
+        {data?.reservations.map((reservation) => (
+          <ReservationCard
+            key={reservation.id}
+            reservation={reservation}
+            onCancel={handleCancel}
+            onSubmitReview={handleSubmitReview}
+          />
+        ))}
+      </div>
     </MyPageLayout>
   );
 };
