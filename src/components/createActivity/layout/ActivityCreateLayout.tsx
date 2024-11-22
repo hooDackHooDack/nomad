@@ -1,15 +1,15 @@
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import Link from 'next/link';
 import { ActivityDetail, ActivityFormInput } from '@/types/activity/activity';
-import Image from 'next/image';
 import { alertModal } from '@/utils/alert/alertModal';
 import { steps } from '@/components/createActivity/layout/steps';
 import { createActivity, updateActivity } from '@/lib/api/activity';
 import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
 import { useActivityFormDiff } from '@/hooks/activity/useActivityFormDiff';
 import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
+import { useActivityDraft } from '@/hooks/activity/useActivityDraft';
+import { MobileStepNavigation } from '@/components/createActivity/navigation/MobileStepNav';
+import { DesktopStepNavigation } from '@/components/createActivity/navigation/DesktopStepNav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,7 +36,6 @@ const ActivityCreateLayout = ({
   const formValues = methods.watch();
   const formDiff = useActivityFormDiff(originalActivity, formValues);
 
-  const { reset } = methods;
   const {
     validateBasicStep,
     validateLocationStep,
@@ -45,197 +44,11 @@ const ActivityCreateLayout = ({
     isFormValid,
   } = useFormValidation(formValues);
 
-  const [alertShown, setAlertShown] = useState(false);
-  const [lastSavedValues, setLastSavedValues] =
-    useState<ActivityFormInput | null>(null);
-  const refreshConfirmed = useRef(false);
-
-  const hasFormChanged = () => {
-    if (!lastSavedValues) return false;
-    return JSON.stringify(formValues) !== JSON.stringify(lastSavedValues);
-  };
-
-  useEffect(() => {
-    let reloadConfirmationShown = false;
-
-    const handleKeyDown = async (e: KeyboardEvent) => {
-      const isRefreshKeyCombo =
-        (e.key === 'r' && (e.ctrlKey || e.metaKey)) || e.key === 'F5';
-
-      if (
-        isRefreshKeyCombo &&
-        hasFormChanged() &&
-        !refreshConfirmed.current &&
-        !reloadConfirmationShown
-      ) {
-        e.preventDefault();
-        reloadConfirmationShown = true;
-
-        try {
-          await new Promise((resolve) => {
-            alertModal({
-              icon: 'warning',
-              title: '작성 중인 내용이 사라질 수 있습니다.',
-              text: '페이지를 새로고침 하시겠습니까?',
-              showCancelButton: true,
-              confirmButtonText: '새로고침',
-              cancelButtonText: '취소',
-              confirmedFunction: () => {
-                refreshConfirmed.current = true;
-                resolve(true);
-              },
-            });
-          });
-
-          // 사용자가 확인을 누른 경우
-          window.location.reload();
-        } catch {
-          // 사용자가 취소를 누른 경우
-          reloadConfirmationShown = false;
-        }
-      }
-    };
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasFormChanged() && !refreshConfirmed.current) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, lastSavedValues]);
-
-  useEffect(() => {
-    const checkDraftData = () => {
-      const draftData = localStorage.getItem('activityFormDraft');
-
-      if (draftData && !alertShown) {
-        // alertShown 상태 확인
-        try {
-          const { data } = JSON.parse(draftData);
-
-          // 현재 경로가 basic인지 확인
-          const currentPath = router.asPath;
-          const isBasicPath = currentPath.includes('/activities/create/basic');
-
-          if (isBasicPath) {
-            alertModal({
-              icon: 'info',
-              text: '기존에 작성 중인 글이 존재합니다. 이어서 작성하시겠습니까?',
-              showCancelButton: true,
-              confirmButtonText: '이어서 작성하기',
-              cancelButtonText: '임시저장 삭제하기',
-              confirmedFunction: () => {
-                reset(data);
-                setLastSavedValues(data);
-              },
-              confirmedDismiss: () => {
-                localStorage.removeItem('activityFormDraft');
-                setLastSavedValues(null);
-              },
-            });
-            setAlertShown(true); // 경고창을 한 번 표시한 후 상태를 업데이트
-          }
-        } catch (error) {
-          console.error('Draft data parsing error:', error);
-          localStorage.removeItem('activityFormDraft');
-          setLastSavedValues(null);
-
-          alertModal({
-            icon: 'error',
-            text: '임시저장된 데이터를 불러오는데 실패했습니다.',
-            confirmButtonText: '확인',
-          });
-        }
-      }
-    };
-
-    if (router.isReady) {
-      checkDraftData();
-    }
-  }, [router.isReady, router.asPath, reset, alertShown]);
-
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      // activity/create/* 경로 밖으로 나가는 경우에 경고창 표시
-      if (hasFormChanged() && !url.startsWith('/activities/create')) {
-        alertModal({
-          icon: 'warning',
-          title: '작성 중인 내용이 사라질 수 있습니다.',
-          text: '페이지를 이동하시겠습니까?',
-          showCancelButton: true,
-          confirmButtonText: '이동하기',
-          cancelButtonText: '취소',
-          confirmedFunction: () => {
-            router.events.off('routeChangeStart', handleRouteChange);
-            router.push(url); // 사용자가 이동을 확인하면 페이지 이동
-          },
-        });
-        throw 'Route change prevented'; // 페이지 이동을 일시 중지
-      }
-    };
-
-    // Next.js의 routeChangeStart 이벤트 사용하여 페이지 이동 감지
-    router.events.on('routeChangeStart', handleRouteChange);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChange); // 이벤트 해제
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, formValues, lastSavedValues]);
-
-  // 24시간이 지난 임시저장 데이터 자동 삭제
-  useEffect(() => {
-    const cleanupDraftData = () => {
-      const draftData = localStorage.getItem('activityFormDraft');
-
-      if (draftData) {
-        try {
-          const { timestamp } = JSON.parse(draftData);
-          const savedTime = new Date(timestamp).getTime();
-          const currentTime = new Date().getTime();
-          const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
-
-          if (hoursDiff >= 24) {
-            localStorage.removeItem('activityFormDraft');
-            setLastSavedValues(null);
-          }
-        } catch (error) {
-          console.error('Draft cleanup error:', error);
-          localStorage.removeItem('activityFormDraft');
-          setLastSavedValues(null);
-        }
-      }
-    };
-
-    cleanupDraftData();
-  }, []);
-
-  const handleTempSave = () => {
-    const formData = methods.getValues();
-    localStorage.setItem(
-      'activityFormDraft',
-      JSON.stringify({
-        data: formData,
-        timestamp: new Date().toISOString(),
-      }),
-    );
-    setLastSavedValues(formData);
-
-    alertModal({
-      icon: 'success',
-      text: '임시저장이 완료되었습니다.',
-      timer: 2000,
-      confirmButtonText: '확인',
+  const { handleTempSave, cleanupDraftData, refreshConfirmed } =
+    useActivityDraft({
+      formValues,
+      reset: methods.reset,
     });
-  };
 
   const handleFormSubmit = async (data: ActivityFormInput) => {
     if (!isFormValid()) {
@@ -270,8 +83,7 @@ const ActivityCreateLayout = ({
         });
       }
 
-      localStorage.removeItem('activityFormDraft');
-      setLastSavedValues(null);
+      cleanupDraftData();
     } catch (error) {
       console.error('Form submit error:', error);
       alertModal({
@@ -346,113 +158,24 @@ const ActivityCreateLayout = ({
       <form onSubmit={methods.handleSubmit(handleFormSubmit)}>
         <div className="min-h-screen bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* 모바일 상단 스텝 네비게이션 */}
-            <nav className="sm:flex sm:items-center sm:justify-center sm:gap-2 sm:mb-6 md:hidden lg:hidden relative">
-              {steps.map((step, index) => {
-                const status = getStepStatus(step.id);
-                const isLast = index === steps.length - 1;
-
-                return (
-                  <div key={step.id} className="flex items-center">
-                    <Link
-                      href={`/activities/${mode}/${step.path}${
-                        mode === 'edit' ? `?id=${activityId}` : ''
-                      }`}
-                      className="relative"
-                    >
-                      <div
-                        className={`
-                        rounded-full p-1
-                        ${
-                          status === 'current'
-                            ? 'border-2 border-green-dark'
-                            : 'border-none'
-                        }
-                      `}
-                      >
-                        <Image
-                          src={step.image}
-                          alt={step.title}
-                          width={28}
-                          height={28}
-                          className={
-                            status === 'completed'
-                              ? 'text-blue-DEFAULT'
-                              : status === 'current'
-                                ? 'text-yellow-DEFAULT'
-                                : 'text-gray-400'
-                          }
-                        />
-                      </div>
-                      {status === 'completed' && (
-                        <div className="absolute -bottom-1 -right-1">
-                          <Image
-                            src="/images/number/check.png"
-                            alt="완료"
-                            width={12}
-                            height={12}
-                          />
-                        </div>
-                      )}
-                    </Link>
-
-                    {/* 연결 점들 */}
-                    {!isLast && (
-                      <div className="flex items-center mx-1">
-                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
+            {/* Mobile */}
+            <MobileStepNavigation
+              steps={steps}
+              mode={mode}
+              activityId={activityId}
+              getStepStatus={getStepStatus}
+            />
 
             <div className="grid grid-cols-12 gap-8">
-              {/* 데스크톱 사이드 네비게이션 */}
+              {/* Desktop */}
               <div className="col-span-3 sm:hidden">
-                <nav className="flex flex-col gap-2">
-                  {steps.map((step) => {
-                    const status = getStepStatus(step.id);
-                    const textColorClass =
-                      status === 'completed'
-                        ? 'text-blue-DEFAULT'
-                        : status === 'current'
-                          ? 'text-yellow-DEFAULT'
-                          : 'text-gray-400';
-
-                    return (
-                      <Link
-                        key={step.id}
-                        href={`/activities/${mode}/${step.path}${
-                          mode === 'edit' ? `?id=${activityId}` : ''
-                        }`}
-                        className={getStepStyles(status)}
-                      >
-                        <span className="mr-3">
-                          <Image
-                            src={step.image}
-                            alt={step.title}
-                            width={20}
-                            height={20}
-                            className={textColorClass}
-                          />
-                        </span>
-                        <span className="flex-1">{step.title}</span>
-                        {status === 'completed' && (
-                          <span className="ml-3">
-                            <Image
-                              src="/images/number/check.png"
-                              alt="완료"
-                              width={16}
-                              height={16}
-                            />
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </nav>
+                <DesktopStepNavigation
+                  steps={steps}
+                  mode={mode}
+                  activityId={activityId}
+                  getStepStatus={getStepStatus}
+                  getStepStyles={getStepStyles}
+                />
 
                 <div className="flex flex-col gap-1 mt-12">
                   <button
@@ -500,7 +223,6 @@ const ActivityCreateLayout = ({
                 </div>
               </div>
 
-              {/* 컨텐츠 영역 */}
               <div className="col-span-9 sm:col-span-12 sm:mb-20">
                 <div className="bg-white shadow rounded-lg p-6 sm:p-4 sm:shadow-none">
                   {children}

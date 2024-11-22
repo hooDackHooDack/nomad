@@ -1,4 +1,3 @@
-// components/createActivity/layout/steps.ts
 export const steps = [
   {
     id: 'basic',
@@ -25,3 +24,12 @@ export const steps = [
     image: '/images/number/four.png',
   },
 ];
+
+export interface Step {
+  id: string;
+  title: string;
+  path: string;
+  image: string;
+}
+
+export type StepStatus = 'completed' | 'current' | 'incomplete' | 'upcoming';
