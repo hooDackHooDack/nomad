@@ -55,4 +55,22 @@ export const ACTIVITY_ALERT_MESSAGES = {
       timer: 2400,
     }),
   },
+  DELETE: {
+    CONFIRM: createActivityAlert({
+      title: '체험 삭제',
+      text: '정말로 이 체험을 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    }),
+    SUCCESS: createActivityAlert({
+      icon: 'success',
+      text: '체험이 성공적으로 삭제되었습니다.',
+    }),
+    ERROR: createActivityAlert({
+      icon: 'error',
+      text: '체험 삭제에 실패했습니다.',
+    }),
+  },
 } as const;
