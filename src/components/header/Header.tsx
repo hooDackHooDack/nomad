@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Bell } from 'lucide-react';
 import { useAuth, logout } from '@/hooks/auth/useAuth';
 import Logo from '/public/logo/logo_row.svg';
 import Dropdown, { DropdownOption } from '@/components/Dropdown';
+import { NotificationPopover } from '../notification/NotificationPopover';
 
 const Header = () => {
   const { user, isLoading } = useAuth();
@@ -41,7 +41,7 @@ const Header = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-              <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <NotificationPopover />
               <div className="w-[1px] h-4 bg-gray-600 sm:hidden"></div>
 
               <Dropdown
