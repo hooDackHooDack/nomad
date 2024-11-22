@@ -1,4 +1,3 @@
-// src/components/notification/NotificationItem.tsx
 import { X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import {ko} from "date-fns/locale";
@@ -13,7 +12,6 @@ export const NotificationItem = ({
   notification,
   onDelete,
 }: NotificationItemProps) => {
-  // content의 상태에 따른 색상 결정
   const highlightKeywords = (content: string) => {
     const parts = content.split(/(승인|거절)/);
     console.log(parts);
