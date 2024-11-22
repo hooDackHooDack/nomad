@@ -1,6 +1,5 @@
 import { AlertModalProps } from '@/utils/alert/alertModal';
 
-// 기본 설정을 위한 유틸리티 함수
 const createAuthAlert = (
   config: Partial<AlertModalProps>,
 ): AlertModalProps => ({
