@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import basicApi from './basic';
 import { alertModal } from '@/utils/alert/alertModal';
+import { AUTH_ALERT_MESSAGES } from '@/components/constants/alert/auth';
 
 interface JWTPayload {
   exp: number;
@@ -81,9 +82,7 @@ const handleUnauthorized = () => {
   }
 
   alertModal({
-    title: '로그인이 필요합니다',
-    text: '로그인 페이지로 이동합니다.',
-    icon: 'warning',
+    ...AUTH_ALERT_MESSAGES.LOGIN.REQUIRED,
     confirmButtonText: '확인',
     confirmedFunction: () => {
       window.location.href = '/auth/login';
