@@ -32,4 +32,27 @@ export const ACTIVITY_ALERT_MESSAGES = {
       text: '액티비티 수정 중 오류가 발생했습니다.',
     }),
   },
+  IMAGE_UPLOAD: {
+    BANNER: {
+      ERROR: createActivityAlert({
+        text: '배너 이미지 업로드에 실패했습니다.',
+        icon: 'error',
+        timer: 2400,
+      }),
+    },
+    SUB_IMAGES: {
+      ERROR: createActivityAlert({
+        text: '소개 이미지 업로드에 실패했습니다.',
+        icon: 'error',
+        timer: 2400,
+      }),
+    },
+  },
+  SCHEDULE: {
+    VALIDATION: createActivityAlert({
+      text: '날짜와 시간을 모두 선택해주세요.',
+      icon: 'error',
+      timer: 2400,
+    }),
+  },
 } as const;
