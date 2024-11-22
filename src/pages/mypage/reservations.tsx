@@ -37,11 +37,7 @@ const ReservationsPage = () => {
       alertModal(RESERVATION_ALERT_MESSAGES.CANCEL.SUCCESS);
     },
     onError: (error: any) => {
-      alertModal({
-        ...RESERVATION_ALERT_MESSAGES.CANCEL.ERROR,
-        showCancelButton: false,
-        confirmButtonText: '확인',
-      });
+      alertModal(RESERVATION_ALERT_MESSAGES.CANCEL.ERROR);
       console.log(error);
     },
   });
