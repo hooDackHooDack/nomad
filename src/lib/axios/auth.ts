@@ -85,7 +85,6 @@ const handleUnauthorized = () => {
     text: '로그인 페이지로 이동합니다.',
     icon: 'warning',
     confirmButtonText: '확인',
-    timer: 3000,
     confirmedFunction: () => {
       window.location.href = '/auth/login';
     },
@@ -105,12 +104,14 @@ authApi.interceptors.request.use(
     const accessToken = Cookies.get('accessToken');
 
     if (!accessToken) {
+      handleUnauthorized();
       throw new axios.Cancel('No access token');
     }
 
     const { isValid, remainingTime } = validateToken(accessToken);
 
     if (!isValid) {
+      handleUnauthorized();
       throw new axios.Cancel('Token invalid');
     }
 
