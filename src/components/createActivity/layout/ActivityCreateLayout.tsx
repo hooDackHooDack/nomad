@@ -1,15 +1,15 @@
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import Link from 'next/link';
 import { ActivityDetail, ActivityFormInput } from '@/types/activity/activity';
-import Image from 'next/image';
 import { alertModal } from '@/utils/alert/alertModal';
 import { steps } from '@/components/createActivity/layout/steps';
 import { createActivity, updateActivity } from '@/lib/api/activity';
 import { useFormValidation } from '@/hooks/activity/useActivityFormValidation';
 import { useActivityFormDiff } from '@/hooks/activity/useActivityFormDiff';
 import { useRequireAuth } from '@/hooks/auth/useRequireAuth';
+import { MobileStepNavigation } from '@/components/createActivity/navigation/MobileStepNav';
+import { DesktopStepNavigation } from '@/components/createActivity/navigation/DesktopStepNav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -346,113 +346,24 @@ const ActivityCreateLayout = ({
       <form onSubmit={methods.handleSubmit(handleFormSubmit)}>
         <div className="min-h-screen bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* 모바일 상단 스텝 네비게이션 */}
-            <nav className="sm:flex sm:items-center sm:justify-center sm:gap-2 sm:mb-6 md:hidden lg:hidden relative">
-              {steps.map((step, index) => {
-                const status = getStepStatus(step.id);
-                const isLast = index === steps.length - 1;
-
-                return (
-                  <div key={step.id} className="flex items-center">
-                    <Link
-                      href={`/activities/${mode}/${step.path}${
-                        mode === 'edit' ? `?id=${activityId}` : ''
-                      }`}
-                      className="relative"
-                    >
-                      <div
-                        className={`
-                        rounded-full p-1
-                        ${
-                          status === 'current'
-                            ? 'border-2 border-green-dark'
-                            : 'border-none'
-                        }
-                      `}
-                      >
-                        <Image
-                          src={step.image}
-                          alt={step.title}
-                          width={28}
-                          height={28}
-                          className={
-                            status === 'completed'
-                              ? 'text-blue-DEFAULT'
-                              : status === 'current'
-                                ? 'text-yellow-DEFAULT'
-                                : 'text-gray-400'
-                          }
-                        />
-                      </div>
-                      {status === 'completed' && (
-                        <div className="absolute -bottom-1 -right-1">
-                          <Image
-                            src="/images/number/check.png"
-                            alt="완료"
-                            width={12}
-                            height={12}
-                          />
-                        </div>
-                      )}
-                    </Link>
-
-                    {/* 연결 점들 */}
-                    {!isLast && (
-                      <div className="flex items-center mx-1">
-                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                        <div className="w-1 h-1 rounded-full bg-gray-300 mx-0.5"></div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
+            {/* Mobile Navigation */}
+            <MobileStepNavigation
+              steps={steps}
+              mode={mode}
+              activityId={activityId}
+              getStepStatus={getStepStatus}
+            />
 
             <div className="grid grid-cols-12 gap-8">
-              {/* 데스크톱 사이드 네비게이션 */}
+              {/* Desktop Navigation */}
               <div className="col-span-3 sm:hidden">
-                <nav className="flex flex-col gap-2">
-                  {steps.map((step) => {
-                    const status = getStepStatus(step.id);
-                    const textColorClass =
-                      status === 'completed'
-                        ? 'text-blue-DEFAULT'
-                        : status === 'current'
-                          ? 'text-yellow-DEFAULT'
-                          : 'text-gray-400';
-
-                    return (
-                      <Link
-                        key={step.id}
-                        href={`/activities/${mode}/${step.path}${
-                          mode === 'edit' ? `?id=${activityId}` : ''
-                        }`}
-                        className={getStepStyles(status)}
-                      >
-                        <span className="mr-3">
-                          <Image
-                            src={step.image}
-                            alt={step.title}
-                            width={20}
-                            height={20}
-                            className={textColorClass}
-                          />
-                        </span>
-                        <span className="flex-1">{step.title}</span>
-                        {status === 'completed' && (
-                          <span className="ml-3">
-                            <Image
-                              src="/images/number/check.png"
-                              alt="완료"
-                              width={16}
-                              height={16}
-                            />
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </nav>
+                <DesktopStepNavigation
+                  steps={steps}
+                  mode={mode}
+                  activityId={activityId}
+                  getStepStatus={getStepStatus}
+                  getStepStyles={getStepStyles}
+                />
 
                 <div className="flex flex-col gap-1 mt-12">
                   <button
