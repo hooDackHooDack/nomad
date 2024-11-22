@@ -22,4 +22,16 @@ export const RESERVATION_ALERT_MESSAGES = {
       icon: 'warning',
     }),
   },
+  STATUS: {
+    UPDATE_SUCCESS: createReservationAlert({
+      icon: 'success',
+      text: '예약 상태가 변경되었습니다.',
+      timer: 2000,
+    }),
+    UPDATE_ERROR: createReservationAlert({
+      icon: 'error',
+      text: '예약 상태 변경에 실패했습니다.',
+      timer: 2000,
+    }),
+  },
 } as const;
