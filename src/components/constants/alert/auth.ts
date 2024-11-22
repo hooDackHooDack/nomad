@@ -18,6 +18,12 @@ export const AUTH_ALERT_MESSAGES = {
       text: '비밀번호가 일치하지 않습니다.',
       icon: 'warning',
     }),
+    REQUIRED: createAuthAlert({
+      title: '로그인이 필요합니다',
+      text: '로그인 페이지로 이동합니다.',
+      icon: 'warning',
+      timer: 3000,
+    }),
   },
   SIGNUP: {
     SUCCESS: createAuthAlert({
