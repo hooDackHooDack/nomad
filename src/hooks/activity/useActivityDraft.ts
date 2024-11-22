@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { ActivityFormInput } from '@/types/activity/activity';
 import { alertModal } from '@/utils/alert/alertModal';
 import { UseFormReset } from 'react-hook-form';
-import { DRAFT_ALERT_MESSAGES } from '@/components/constants/alert/createDraft';
+import { DRAFT_ALERT_MESSAGES } from '@/components/constants/alert/activityDraft';
 
 interface DraftStorage {
   data: ActivityFormInput;
