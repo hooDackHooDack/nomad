@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 
-interface Props {
+export interface AlertModalProps {
   title?: string;
   text?: string;
   icon?: 'success' | 'error' | 'warning' | 'info' | 'question';
@@ -35,7 +35,7 @@ export function alertModal({
   willClose,
   confirmedFunction,
   confirmedDismiss,
-}: Props) {
+}: AlertModalProps) {
   Swal.fire({
     title: title,
     text: text,

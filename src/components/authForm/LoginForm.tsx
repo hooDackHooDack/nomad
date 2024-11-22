@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import SubmitButton from '@/components/form/submitButton/SubmitButton';
 import SocialBox from '../form/socialBox/SocialBox';
 import { alertModal } from '@/utils/alert/alertModal';
+import { AUTH_ALERT_MESSAGES } from '../constants/alert/auth';
 
 export default function LoginForm() {
   const { login, user, isLoading, isLoginLoading } = useAuth();
@@ -33,19 +34,9 @@ export default function LoginForm() {
           const err = error as ErrorResponse;
           if (err.response) {
             if (err.response.status === 404) {
-              alertModal({
-                text: '존재하지 않는 이메일 입니다.',
-                icon: 'warning',
-                confirmButtonText: '확인',
-                timer: 2400,
-              });
+              alertModal(AUTH_ALERT_MESSAGES.LOGIN.EMAIL_NOT_FOUND);
             } else if (err.response.status === 400) {
-              alertModal({
-                text: '비밀번호가 일치하지 않습니다.',
-                icon: 'warning',
-                confirmButtonText: '확인',
-                timer: 2400,
-              });
+              alertModal(AUTH_ALERT_MESSAGES.LOGIN.PASSWORD_MISMATCH);
             }
           }
         },
