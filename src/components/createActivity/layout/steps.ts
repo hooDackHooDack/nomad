@@ -1,4 +1,3 @@
-// components/createActivity/layout/steps.ts
 export const steps = [
   {
     id: 'basic',
