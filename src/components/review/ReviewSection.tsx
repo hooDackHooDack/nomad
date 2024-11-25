@@ -19,7 +19,6 @@ export const ReviewSection = ({ activityId }: ReviewSectionProps) => {
     queryKey: ['reviews', activityId, currentPage],
     queryFn: async () => {
       const response = await getReview(activityId, currentPage, PAGE_SIZE);
-      console.log('Review Response:', response.data); // 데이터 확인용
       return response.data;
     },
   });
@@ -64,6 +63,7 @@ export const ReviewSection = ({ activityId }: ReviewSectionProps) => {
               alt="image"
               width={80}
               height={80}
+              style={{ width: 'auto', height: 'auto' }}
             />
             <div className="text-gray-500 text-2xl">리뷰는 아직 없는걸요</div>
           </div>

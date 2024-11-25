@@ -13,6 +13,7 @@ const TipTapContentRenderer: React.FC<TipTapContentRendererProps> = ({
     extensions: [StarterKit],
     content,
     editable: false,
+    immediatelyRender: false,
   });
 
   useEffect(() => {
