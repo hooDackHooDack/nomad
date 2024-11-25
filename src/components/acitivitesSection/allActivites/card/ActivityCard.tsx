@@ -8,13 +8,15 @@ const ActivityCard = ({ activity }: { activity: Activity }) => (
     className="block w-full h-full transition-transform duration-200 hover:scale-105"
   >
     <div className="w-full h-full bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer overflow-hidden">
-      <CustomImage
-        src={activity.bannerImageUrl}
-        alt={activity.title}
-        className="w-full h-64 object-cover"
-        width={400}
-        height={400}
-      />
+      <div className="relative w-full aspect-[4/3]">
+        <CustomImage
+          src={activity.bannerImageUrl}
+          alt={activity.title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       <div className="p-5">
         <div className="flex items-center mb-4">

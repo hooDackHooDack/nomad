@@ -24,11 +24,13 @@ const PopularActivityCard = ({ activity }: PopularActivityCardProps) => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <CustomImage
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             src={activity.bannerImageUrl}
             fallbackSrc="/logo/logo_col_white.svg"
             fill
             className="object-cover"
             alt={activity.title}
+            priority
           />
         </div>
 

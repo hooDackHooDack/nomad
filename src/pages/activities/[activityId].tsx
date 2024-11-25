@@ -5,14 +5,19 @@ import basicApi from '@/lib/axios/basic';
 import { Activity } from '@/types/activity/activity';
 import KakaoMap from '@/components/kakaoMap/KakaoMap';
 import LocationIcon from '/public/icons/button/Location.svg';
-import Image from 'next/image';
 import ActivityReservation from '@/components/booking/ActivityReservation';
 import { ReviewSection } from '@/components/review/ReviewSection';
-import QuillContentRenderer from '@/components/react-quill/QuillContentRenderer';
+import TipTapContentRenderer from '@/components/tiptap/TipTapContentRenderer';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import CustomImage from '@/components/fallback/CustomImage';
 
 const fetchActivityDetail = async (activityId: string) => {
   const { data } = await basicApi.get<Activity>(`activities/${activityId}`);
-  console.log(data.id);
   return data;
 };
 
@@ -21,6 +26,7 @@ const ActivityDetailPage = () => {
   const { activityId } = router.query;
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const { data: activity, isLoading } = useQuery<Activity, Error>({
     queryKey: ['activityItem', activityId],
@@ -45,7 +51,16 @@ const ActivityDetailPage = () => {
     );
   }
 
-  // 모든 이미지 배열 생성
+  const handleThumbnailClick = (e: React.MouseEvent, image: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedImage('');
+    setTimeout(() => {
+      // 새 이미지 설정
+      setSelectedImage(image);
+    }, 0);
+  };
+
   const allImages = [
     activity.bannerImageUrl,
     ...activity.subImages.slice(0, 4).map((img) => img.imageUrl),
@@ -57,52 +72,77 @@ const ActivityDetailPage = () => {
         {/* 이미지 갤러리 */}
         <div className="relative mb-8">
           {/* 메인 이미지 */}
-          <div className="relative aspect-[16/9] md:aspect-[16/8] rounded-xl overflow-hidden">
+          <div
+            className="relative aspect-[16/9] md:aspect-[16/8] rounded-xl overflow-hidden cursor-zoom-in"
+            onClick={() => setIsImageModalOpen(true)}
+          >
             {isImageLoaded && selectedImage && (
-              <Image
+              <CustomImage
                 src={selectedImage}
                 alt={activity?.title || 'Activity image'}
                 fill
                 priority={selectedImage === activity?.bannerImageUrl}
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                quality={75}
-                onError={() => setIsImageLoaded(false)}
               />
             )}
 
             {/* 썸네일 그리드 */}
             {isImageLoaded && (
               <div className="absolute bottom-4 right-4 flex gap-2 z-10">
-                {allImages.map(
-                  (image, index) =>
-                    image && (
-                      <div
-                        key={index}
-                        onClick={() => setSelectedImage(image)}
-                        className={`
-                      w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden cursor-pointer
-                      transition-all duration-200 hover:opacity-90
-                      ${selectedImage === image ? 'ring-2 ring-white' : 'ring-1 ring-white/50'}
-                      ${selectedImage === image ? 'opacity-100' : 'opacity-70'}
-                    `}
-                      >
-                        <div className="relative w-full h-full">
-                          <Image
-                            src={image}
-                            alt={`Thumbnail ${index + 1}`}
-                            fill
-                            priority
-                            className="object-cover"
-                            sizes="(max-width: 768px) 48px, 64px"
-                          />
-                        </div>
-                      </div>
-                    ),
-                )}
+                {allImages.map((image, index) => (
+                  <div
+                    key={index}
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => handleThumbnailClick(e, image)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter')
+                        handleThumbnailClick(
+                          e as unknown as React.MouseEvent,
+                          image,
+                        );
+                    }}
+                    className={`
+                    w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden cursor-pointer
+                    transition-all duration-200 hover:opacity-90
+                    ${selectedImage === image ? 'ring-2 ring-white' : 'ring-1 ring-white/50'}
+                    ${selectedImage === image ? 'opacity-100' : 'opacity-70'}
+                  `}
+                  >
+                    <div className="relative w-full h-full">
+                      <CustomImage
+                        src={image}
+                        alt={`Thumbnail ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="48px"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
+          <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+            <DialogContent className="max-w-4xl w-[90vw]">
+              <DialogTitle className="sr-only">이미지 상세보기</DialogTitle>
+              <DialogDescription className="sr-only">
+                선택한 이미지를 더 크게 볼 수 있습니다
+              </DialogDescription>
+              <div className="relative aspect-[4/3]">
+                {selectedImage && (
+                  <CustomImage
+                    src={selectedImage}
+                    alt={activity?.title || 'Activity image'}
+                    fill
+                    className="object-contain"
+                    sizes="80vw"
+                  />
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         <div>
           <div className="col-span-12 lg:col-span-8">
@@ -121,10 +161,9 @@ const ActivityDetailPage = () => {
               <div className="w-full h-[1px] bg-[#112211] opacity-25 mb-8" />
               {/* 설명 */}
               <div className="mb-8">
-                {/* <h2 className="text-xl font-semibold mb-4">프로그램 설명</h2> */}
-                <p className="text-gray-700 whitespace-pre-line">
-                  <QuillContentRenderer content={activity.description} />
-                </p>
+                <div className="text-gray-700 whitespace-pre-line">
+                  <TipTapContentRenderer content={activity.description} />
+                </div>
               </div>
               <div className="w-full h-[1px] bg-[#112211] opacity-25 mb-8" />
               <div className="mb-8">
