@@ -4,6 +4,7 @@ import { PlusIcon, XIcon } from 'lucide-react';
 import { ActivityFormInput } from '@/types/activity/activity';
 import authApi from '@/lib/axios/auth';
 import { alertModal } from '@/utils/alert/alertModal';
+import { ACTIVITY_ALERT_MESSAGES } from '@/components/constants/alert/activityCreate';
 
 interface ImageUploadResponse {
   activityImageUrl: string;
@@ -57,12 +58,7 @@ const ImageUploadStep = () => {
         setValue('bannerImageUrl', imageUrl, { shouldDirty: true });
       } catch (error) {
         console.error('Banner image upload error:', error);
-        alertModal({
-          text: '배너 이미지 업로드에 실패했습니다.',
-          icon: 'error',
-          confirmButtonText: '확인',
-          timer: 2400,
-        });
+        alertModal(ACTIVITY_ALERT_MESSAGES.IMAGE_UPLOAD.BANNER.ERROR);
       }
     }
   };
@@ -101,12 +97,7 @@ const ImageUploadStep = () => {
       setValue('subImageUrls', newSubImageUrls, { shouldDirty: true });
     } catch (error) {
       console.error('Sub image upload error:', error);
-      alertModal({
-        text: '소개 이미지 업로드에 실패했습니다.',
-        icon: 'error',
-        confirmButtonText: '확인',
-        timer: 2400,
-      });
+      alertModal(ACTIVITY_ALERT_MESSAGES.IMAGE_UPLOAD.SUB_IMAGES.ERROR);
     }
   };
 

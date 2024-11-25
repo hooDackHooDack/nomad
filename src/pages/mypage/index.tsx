@@ -8,6 +8,7 @@ import { alertModal } from '@/utils/alert/alertModal';
 import { uploadImage } from '@/lib/api/user';
 import { ProfileFormData } from '@/types/user/userInfo';
 import MyPageLayout from '@/components/mypage/MypageLayout';
+import { PROFILE_ALERT_MESSAGES } from '@/components/constants/alert/userProfile';
 
 const MyInfoPage = () => {
   const { user, isLoading, updateUser, isUpdateLoading } = useAuth();
@@ -47,18 +48,10 @@ const MyInfoPage = () => {
           profileImageUrl: watchProfileImageUrl || user.profileImageUrl,
           newPassword: watchNewPassword,
         });
-        alertModal({
-          icon: 'success',
-          text: '정보가 성공적으로 업데이트되었습니다.',
-          confirmButtonText: '확인',
-        });
+        alertModal(PROFILE_ALERT_MESSAGES.UPDATE.SUCCESS);
       } catch (error) {
         console.error('Failed to update profile:', error);
-        alertModal({
-          icon: 'error',
-          text: '정보 업데이트 중 오류가 발생했습니다.',
-          confirmButtonText: '확인',
-        });
+        alertModal(PROFILE_ALERT_MESSAGES.UPDATE.ERROR);
       }
   };
 
@@ -81,11 +74,7 @@ const MyInfoPage = () => {
         setValue('profileImageUrl', imageUrl, { shouldDirty: true });
       } catch (error) {
         console.error('Image upload failed:', error);
-        alertModal({
-          text: '프로필 이미지 업로드에 실패했습니다.',
-          icon: 'error',
-          confirmButtonText: '확인',
-        });
+        alertModal(PROFILE_ALERT_MESSAGES.IMAGE.UPLOAD_ERROR);
       }
     }
   };

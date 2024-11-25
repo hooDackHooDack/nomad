@@ -3,6 +3,7 @@ import MyPageLayout from '@/components/mypage/MypageLayout';
 import { deleteMyActivity, fetchMyActivities } from '@/lib/api/activity';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { alertModal } from '@/utils/alert/alertModal';
+import { ACTIVITY_ALERT_MESSAGES } from '@/components/constants/alert/activityCreate';
 
 const MyActivitiesPage = () => {
   const queryClient = useQueryClient();
@@ -12,34 +13,22 @@ const MyActivitiesPage = () => {
     queryFn: fetchMyActivities,
   });
   const activities = data?.data?.activities ?? [];
-  
+
   const deleteMutation = useMutation({
     mutationFn: (activityId: number) => deleteMyActivity(activityId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myActivities'] });
-      alertModal({
-        icon: 'success',
-        text: '체험이 성공적으로 삭제되었습니다.',
-        confirmButtonText: '확인',
-      });
+      alertModal(ACTIVITY_ALERT_MESSAGES.DELETE.SUCCESS);
     },
     onError: (error) => {
-      alertModal({
-        icon: 'error',
-        text: `체험 삭제에 실패했습니다: ${error.message}`,
-        confirmButtonText: '확인',
-      });
+      alertModal(ACTIVITY_ALERT_MESSAGES.DELETE.ERROR);
+      console.log(error);
     },
   });
 
   const handleDelete = (activityId: number) => {
     alertModal({
-      title: '체험 삭제',
-      text: '정말로 이 체험을 삭제하시겠습니까?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: '삭제',
-      cancelButtonText: '취소',
+      ...ACTIVITY_ALERT_MESSAGES.DELETE.CONFIRM,
       confirmedFunction: () => deleteMutation.mutate(activityId),
     });
   };

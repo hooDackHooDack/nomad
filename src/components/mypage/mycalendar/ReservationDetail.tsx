@@ -19,6 +19,7 @@ import {
 } from '@/lib/api/myReservation';
 import ReservationStatusTabs from './ReservationStatus';
 import ReservationCard from './ReservationCard';
+import { RESERVATION_ALERT_MESSAGES } from '@/components/constants/alert/reservation';
 
 interface ReservedSchedule {
   scheduleId: number;
@@ -101,18 +102,10 @@ const ReservationDetail = ({
         ],
       });
 
-      alertModal({
-        icon: 'success',
-        text: '예약 상태가 변경되었습니다.',
-        timer: 2000,
-      });
+      alertModal(RESERVATION_ALERT_MESSAGES.STATUS.UPDATE_SUCCESS);
     },
     onError: (error: any) => {
-      alertModal({
-        icon: 'error',
-        text: '예약 상태 변경에 실패했습니다.',
-        timer: 2000,
-      });
+      alertModal(RESERVATION_ALERT_MESSAGES.STATUS.UPDATE_ERROR);
       console.error('Failed to update reservation status:', error);
     },
   });

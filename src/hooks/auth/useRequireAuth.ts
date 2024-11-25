@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from './useAuth';
 import { alertModal } from '@/utils/alert/alertModal';
+import { AUTH_ALERT_MESSAGES } from '@/components/constants/alert/auth';
 
 export function useRequireAuth() {
   const router = useRouter();
@@ -13,10 +14,7 @@ export function useRequireAuth() {
     };
     if (!isLoading && !user) {
       alertModal({
-        title: '로그인이 필요합니다',
-        text: '로그인 페이지로 이동합니다.',
-        icon: 'warning',
-        timer: 3000,
+        ...AUTH_ALERT_MESSAGES.LOGIN.REQUIRED,
         confirmedFunction: redirectToLogin,
         willClose: redirectToLogin,
       });

@@ -12,6 +12,7 @@ import { ko } from 'date-fns/locale';
 import { checkSchedule, reservationsActivity } from '@/lib/api/activity';
 import { Calendar } from '@/components/ui/calendar';
 import { alertModal } from '@/utils/alert/alertModal';
+import { RESERVATION_ALERT_MESSAGES } from '../constants/alert/reservation';
 
 interface ActivityReservationProps {
   title: string;
@@ -95,27 +96,15 @@ const ActivityReservation = ({
           activityId,
         });
         if (response.status === 201) {
-          alertModal({
-            icon: 'success',
-            text: '예약이 성공적으로 완료되었습니다.',
-            timer: 3000,
-          });
+          alertModal(RESERVATION_ALERT_MESSAGES.SUCCESS);
         }
         setOpen(false);
       } catch (error: any) {
         const errCode = error.status;
         if (errCode === 409) {
-          alertModal({
-            icon: 'warning',
-            text: '이미 신청한 예약 입니다',
-            timer: 3000,
-          });
+          alertModal(RESERVATION_ALERT_MESSAGES.ERROR.ALREADY_EXISTS);
         } else if (errCode === 400) {
-          alertModal({
-            icon: 'warning',
-            text: '이미 지난 일정은 예약할 수 없습니다.',
-            timer: 3000,
-          });
+          alertModal(RESERVATION_ALERT_MESSAGES.ERROR.PAST_DATE);
         }
       } finally {
         setStep('select');

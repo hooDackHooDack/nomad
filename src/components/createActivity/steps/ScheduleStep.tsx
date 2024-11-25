@@ -6,6 +6,7 @@ import TimeInput from '@/components/form/input/schedule/TimeInput';
 import { formatTime } from '@/utils/schedule/timeFormat';
 import TimePicker from '@/components/form/input/schedule/TimePicker';
 import { alertModal } from '@/utils/alert/alertModal';
+import { ACTIVITY_ALERT_MESSAGES } from '@/components/constants/alert/activityCreate';
 
 const ScheduleStep = () => {
   const { watch, setValue } = useFormContext<ActivityFormInput>();
@@ -19,12 +20,7 @@ const ScheduleStep = () => {
 
   const addSchedule = () => {
     if (!tempDate || !tempStartTime || !tempEndTime) {
-      alertModal({
-        text: '날짜와 시간을 모두 선택해주세요.',
-        icon: 'error',
-        confirmButtonText: '확인',
-        timer: 2400,
-      });
+      alertModal(ACTIVITY_ALERT_MESSAGES.SCHEDULE.VALIDATION);
       return;
     }
 
